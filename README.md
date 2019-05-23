@@ -1,2 +1,2 @@
 # DdaleApp
-Application android visant à utiliser la réalité augmenté pour agrémenter la visite de musés.
+Application Android visant à utiliser la réalité augmentée pour agrémenter la visite de musées.
