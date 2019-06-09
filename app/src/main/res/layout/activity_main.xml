@@ -58,4 +58,15 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.50073206" />
 
+    <Button
+        android:id="@+id/btnDebugAR"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@color/colorAccent"
+        android:text="Debug AR"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
