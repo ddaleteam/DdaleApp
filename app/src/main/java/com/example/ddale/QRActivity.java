@@ -8,6 +8,7 @@ import android.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import com.google.zxing.Result;
 
@@ -18,24 +19,30 @@ public class QRActivity extends AppCompatActivity implements ZXingScannerView.Re
     private ZXingScannerView mScannerView;
     private FrameLayout mCameraView;
     private String CAT="QR";
+    private TextView consigne;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_qr);
-
-
+        consigne = findViewById(R.id.consigneQR);
         mCameraView = findViewById(R.id.camera_preview);
-
         mScannerView = new ZXingScannerView(getApplicationContext());
-
         mCameraView.addView(mScannerView);
 
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},1);
-
+        consigne.bringToFront();
         mScannerView.setResultHandler(this);
-        mScannerView.startCamera();
+
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mScannerView.startCamera();
+
+    }
+
     public void handleResult(Result result){
         Log.v(CAT, result.getText());
         Log.v(CAT,result.getBarcodeFormat().toString());
