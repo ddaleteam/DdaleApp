@@ -4,5 +4,7 @@
     <string name="choix_parcours">Choix Parcours</string>
     <string name="question">Bienvenue sur l\'application Ddale ! \n\n
         Que voulez-vous faire aujourd\'hui ? </string>
+    <string name="consigneQR">This your captain speaking.
+        \n\nPlease scan the QR Code next to the tableau.</string>
 
 </resources>
