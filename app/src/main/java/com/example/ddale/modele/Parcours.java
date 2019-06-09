@@ -150,13 +150,13 @@ public class Parcours {
 
     /* Verification de l'affichage des methodes toString sous format JSON (penser a initialiser manuellement les identifiants !)
     public static void main(String[] args){
-        Anecdote mAnecdote1 = new Anecdote(10,-5, "coucou");
-        Anecdote mAnecdote2 = new Anecdote(8,-3, "salut");
+        Calque mAnecdote1 = new Calque("coucou", "cc", "anecdote");
+        Calque mAnecdote2 = new Calque("salut", "yo", "composition");
         Oeuvre mOeuvre1 = new Oeuvre();
         Oeuvre mOeuvre2 = new Oeuvre();
-        mOeuvre1.getAnecdotes().add(mAnecdote1);
-        mOeuvre2.getAnecdotes().add(mAnecdote1);
-        mOeuvre2.getAnecdotes().add(mAnecdote2);
+        mOeuvre1.getCalques().add(mAnecdote1);
+        mOeuvre2.getCalques().add(mAnecdote1);
+        mOeuvre2.getCalques().add(mAnecdote2);
         Parcours mParcours = new Parcours();
         mParcours.getOeuvres().add(mOeuvre1);
         mParcours.getOeuvres().add(mOeuvre2);
