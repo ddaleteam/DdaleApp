@@ -43,9 +43,13 @@ public class Oeuvre {
      */
     private String technique;
     /**
-     * <b>anecdotes</b> represente la liste des anecdotes associees a l'oeuvre
+     * <b>urlImageCible</b> represente l'URL de l'image de l'oeuvre a reconnaitre
      */
-    private List<Anecdote> anecdotes;
+    private String urlImageCible;
+    /**
+     * <b>calques</b> represente la liste des calques associees a l'oeuvre
+     */
+    private List<Calque> calques;
     /**
      * <b>audio</b> contient une URL dirigeant vers le fichier audio associe a l'oeuvre
      */
@@ -58,7 +62,7 @@ public class Oeuvre {
 
     /**
      * Constructeur par defaut
-     * La liste des anecdotes est vide, la position de l'oeuvre est 0, tous les autres champs sont
+     * La liste des calques est vide, la position de l'oeuvre est 0, tous les autres champs sont
      *      des chaines vides
      */
     public Oeuvre() {
@@ -68,7 +72,8 @@ public class Oeuvre {
         date = "";
         dimensions = "";
         technique = "";
-        anecdotes = new ArrayList<>();
+        urlImageCible = "";
+        calques = new ArrayList<>();
         audio = "";
         composition = "";
     }
@@ -82,20 +87,22 @@ public class Oeuvre {
      * @param date sa date de creation
      * @param dimensions ses dimensions
      * @param technique la technique utilisee
+     * @param urlImageCible l'URL de l'image de l'oeuvre cible
      * @param audio le lien vers le fichier audio
      * @param composition le lien vers les fichiers images
-     * La liste des anecdotes est vide
+     * La liste des calques est vide
      */
-    public Oeuvre(int position, String titre, String auteur, String date, String dimensions, String technique, String audio, String composition) {
+    public Oeuvre(int position, String titre, String auteur, String date, String dimensions, String technique, String urlImageCible, String audio, String composition) {
         this.position = position;
         this.titre = titre;
         this.auteur = auteur;
         this.date = date;
         this.dimensions = dimensions;
         this.technique = technique;
+        this.urlImageCible = urlImageCible;
         this.audio = audio;
         this.composition = composition;
-        anecdotes = new ArrayList<>();
+        calques = new ArrayList<>();
     }
 
     /**
@@ -106,18 +113,20 @@ public class Oeuvre {
      * @param date sa date de creation
      * @param dimensions ses dimensions
      * @param technique la technique utilisee
-     * @param anecdotes la liste des anecdotes
+     * @param urlImageCible l'URL de l'image de l'oeuvre cible
+     * @param calques la liste des calques
      * @param audio le lien vers le fichier audio
      * @param composition le lien vers les fichiers images
      */
-    public Oeuvre(int position, String titre, String auteur, String date, String dimensions, String technique, List<Anecdote> anecdotes, String audio, String composition) {
+    public Oeuvre(int position, String titre, String auteur, String date, String dimensions, String technique, String urlImageCible, List<Calque> calques, String audio, String composition) {
         this.position = position;
         this.titre = titre;
         this.auteur = auteur;
         this.date = date;
         this.dimensions = dimensions;
         this.technique = technique;
-        this.anecdotes = anecdotes;
+        this.urlImageCible = urlImageCible;
+        this.calques = calques;
         this.audio = audio;
         this.composition = composition;
     }
@@ -227,19 +236,35 @@ public class Oeuvre {
     }
 
     /**
-     * Accesseur de la liste des anecdotes
-     * @return la liste des anecdotes associees a l'oeuvre
+     * Accesseur de l'URL
+     * @return l'URL de l'image de l'oeuvre cible
      */
-    public List<Anecdote> getAnecdotes() {
-        return anecdotes;
+    public String getUrlImageCible() {
+        return urlImageCible;
     }
 
     /**
-     * Mutateur de la liste des anecdotes
-     * @param anecdotes la nouvelle liste a attribuer
+     * Mutateur de l'URL de l'image de l'ouvre cible
+     * @param urlImageCible la nouvelle URL a attribuer
      */
-    public void setAnecdotes(List<Anecdote> anecdotes) {
-        this.anecdotes = anecdotes;
+    public void setUrlImageCible(String urlImageCible) {
+        this.urlImageCible = urlImageCible;
+    }
+
+    /**
+     * Accesseur de la liste des calques
+     * @return la liste des calques associees a l'oeuvre
+     */
+    public List<Calque> getCalques() {
+        return calques;
+    }
+
+    /**
+     * Mutateur de la liste des calques
+     * @param calques la nouvelle liste a attribuer
+     */
+    public void setCalques(List<Calque> calques) {
+        this.calques = calques;
     }
 
     /**
@@ -288,10 +313,11 @@ public class Oeuvre {
                 ", \"date\": \"" + date + '\"' +
                 ", \"dimensions\": \"" + dimensions + '\"' +
                 ", \"technique\": \"" + technique + '\"' +
-                ", \"anecdotes\": [";
-        Iterator<Anecdote> iterator = anecdotes.iterator();
+                ", \"urlImageCible\": \"" + urlImageCible + '\"' +
+                ", \"calques\": [";
+        Iterator<Calque> iterator = calques.iterator();
         while (iterator.hasNext()) {
-            Anecdote a = iterator.next();
+            Calque a = iterator.next();
             String afficheAnecdote = a.toString();
             afficheAnecdote = afficheAnecdote.substring(13);
             afficheAnecdote = afficheAnecdote.substring(0, (afficheAnecdote.length() - 1));
