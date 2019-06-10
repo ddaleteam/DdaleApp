@@ -44,7 +44,7 @@ class ARManager
     private int rotation = 0;
     private Vec4I viewport = new Vec4I(0, 0, 1280, 720);
 
-    private SquareRenderer squareRenderer;
+    private RectangleRenderer rectangleRenderer;
     private Context context;
     private int idCalque;
 
@@ -145,7 +145,7 @@ class ARManager
         }
         trackers.clear();
 
-        squareRenderer = null;
+        rectangleRenderer = null;
 
         if (videobg_renderer != null) {
             videobg_renderer.dispose();
@@ -198,8 +198,8 @@ class ARManager
         }
         videobg_renderer = new Renderer();
 
-        squareRenderer = new SquareRenderer();
-        squareRenderer.init(context, idCalque);
+        rectangleRenderer = new RectangleRenderer();
+        rectangleRenderer.init(context, idCalque);
     }
 
     /**
@@ -283,8 +283,8 @@ class ARManager
                     if (imagetarget == null) {
                         continue;
                     }
-                    if (squareRenderer != null) {
-                        squareRenderer.render(camera.projectionGL(0.2f, 500.f), 
+                    if (rectangleRenderer != null) {
+                        rectangleRenderer.render(camera.projectionGL(0.2f, 500.f),
                                 targetInstance.poseGL(), imagetarget.size());
                     }
 
@@ -315,7 +315,7 @@ class ARManager
                 idCalque = nextId;
                 break;
         }
-        squareRenderer.imageSuivante(context,nextId);
+        rectangleRenderer.imageSuivante(context,nextId);
     }
 
     //end region Actions
