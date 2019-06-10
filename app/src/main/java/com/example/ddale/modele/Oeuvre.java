@@ -1,5 +1,7 @@
 package com.example.ddale.modele;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -17,47 +19,58 @@ public class Oeuvre {
      * <b>id</b> represente l'identifiant unique de l'oeuvre
      * Cet identifiant est instancie par l'API
      */
+    @SerializedName("id")
     private int id;
     /**
      * <b>position</b> represente la position de l'oeuvre dans le musee
      */
+    @SerializedName("position")
     private int position;
     /**
      * <b>titre</b> represente le titre de l'oeuvre
      */
+    @SerializedName("titre")
     private String titre;
     /**
      * <b>auteur</b> represente l'auteur de l'oeuvre
      */
+    @SerializedName("auteur")
     private String auteur;
     /**
      * <b>date</b> represente la date de creation de l'oeuvre
      */
+    @SerializedName("date")
     private String date;
     /**
      * <b>dimensions</b> represente les dimensions de l'oeuvre (hauteur x largeur pour un tableau)
      */
+    @SerializedName("dimensions")
     private String dimensions;
     /**
      * <b>technique</b> represente la technique utilisee pour creer l'oeuvre
      */
+    @SerializedName("technique")
     private String technique;
     /**
      * <b>urlImageCible</b> represente l'URL de l'image de l'oeuvre a reconnaitre
      */
+    @SerializedName("urlImageCible")
     private String urlImageCible;
     /**
      * <b>calques</b> represente la liste des calques associees a l'oeuvre
      */
+    @SerializedName("calques")
     private List<Calque> calques;
     /**
      * <b>audio</b> contient une URL dirigeant vers le fichier audio associe a l'oeuvre
      */
+    @SerializedName("audio")
     private String audio;
     /**
      * <b>composition</b> contient une URL dirigeant vers les fichiers images associes a l'oeuvre
      * Ces images sont superposees a l'oeuvre lors de l'affichage (realite augmentee)
      */
+    @SerializedName("composition")
     private String composition;
 
     /**
@@ -129,6 +142,18 @@ public class Oeuvre {
         this.calques = calques;
         this.audio = audio;
         this.composition = composition;
+    }
+    public Oeuvre( Oeuvre oeuvre){
+        this.position = oeuvre.position;
+        this.titre = oeuvre.titre;
+        this.auteur = oeuvre.auteur;
+        this.date = oeuvre.date;
+        this.dimensions = oeuvre.dimensions;
+        this.technique = oeuvre.technique;
+        this.urlImageCible = oeuvre.urlImageCible;
+        this.calques = oeuvre.calques;
+        this.audio = oeuvre.audio;
+        this.composition = oeuvre.composition;
     }
 
     /**

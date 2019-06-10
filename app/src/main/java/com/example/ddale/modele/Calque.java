@@ -1,5 +1,7 @@
 package com.example.ddale.modele;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * <b>Classe Calque</b>
  * Cette classe represente un calque
@@ -14,18 +16,22 @@ public class Calque {
      * <b>id</b> represente l'identifiant unique du calque
      * Cet identifiant est instancie par l'API
      */
+    @SerializedName("id")
     private int id;
     /**
      * <b>description</b> represente le texte associe au calque
      */
+    @SerializedName("description")
     private String description;
     /**
      * <b>urlCalque</b> represente le texte associe au calque
      */
+    @SerializedName("urlCalque")
     private String urlCalque;
     /**
      * <b>type</b> represente le type du calque
      */
+    @SerializedName("type")
     private String type;
 
     /**
