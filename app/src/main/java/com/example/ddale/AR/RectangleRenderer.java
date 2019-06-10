@@ -19,18 +19,18 @@ class RectangleRenderer {
     private String CAT = "Rectangle";
     private int mProgram;
 
-    private int mPoigneeCoordonneesRectangle;
-    private int mPoigneeMatriceProjection;
-    private int mPoigneeMatriceTransformation;
-    private int mPoigneeVBOCoordonneesRectangle;
+    private int refCoordRect;
+    private int refMatriceProj;
+    private int refMatriceTransformation;
+    private int refBufferCoordRect;
 
-    private int mPoigneeDonneesTexture;
-    private int mPoigneeCoordonneesTexture;
-    private int mPoigneeVBOCoordonneesTexture;
+    private int refDataTexture;
+    private int refCoordTexture;
+    private int refBufferCoordTexture;
     private float hauteurCalque;
     private float largeurCalque;
 
-    private int mPoigneeCouleur;
+    private int refCouleur;
     private float[] couleur;
 
     private short[] ordreDessin;
@@ -84,10 +84,10 @@ class RectangleRenderer {
     }
 
     /**
-     * Fonction qui "applatis" des tableaux de coordonnes
-     * pour en faire des "listes" lisible par des buffers
-     * @param a tableau de floats à "applatir"
-     * @return une "liste" contenant les floatants présnets dans le tableau
+     * Fonction qui "applatis" les tableaux de coordonnes
+     * pour en faire des tableaux passable dans un buffer (1 ligne)
+     * @param a tableau à applatir
+     * @return un tableau à une ligne contenant les valeurs du tableau initial
      */
     private float[] applatir(float[][] a) {
         int tailleTotale = 0;
@@ -115,22 +115,22 @@ class RectangleRenderer {
     }
 
     private int creerTexture(Bitmap bitmap){
-        final int[] poigneeDonneesTexture = new int[1];
-        GLES20.glGenTextures(1, poigneeDonneesTexture, 0);
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, poigneeDonneesTexture[0]);
+        final int[] refDataTexture = new int[1];
+        GLES20.glGenTextures(1, refDataTexture, 0);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, refDataTexture[0]);
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
-        majTexture(poigneeDonneesTexture[0], bitmap);
-        return poigneeDonneesTexture[0];
+        majTexture(refDataTexture[0], bitmap);
+        return refDataTexture[0];
     }
 
-    private void majTexture(int poigneeDonneesTexture, Bitmap bitmap) {
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, poigneeDonneesTexture);
+    private void majTexture(int refDataTexture, Bitmap bitmap) {
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, refDataTexture);
         GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
     }
     // end region utils
 
-    void init(final Context context,final int resourceId) {
+    void init(final Context context,final int idCalque) {
 
         /* Initialisation du programme OpenGL **/
         mProgram = GLES20.glCreateProgram();
@@ -153,18 +153,18 @@ class RectangleRenderer {
         GLES20.glUseProgram(mProgram);
 
         /* Récupération des poignées */
-        mPoigneeCoordonneesRectangle = GLES20.glGetAttribLocation(mProgram, "aCoordRect");
-        mPoigneeMatriceProjection = GLES20.glGetUniformLocation(mProgram, "uMatProj");
-        mPoigneeMatriceTransformation = GLES20.glGetUniformLocation(mProgram,"uMatTrans");
-        mPoigneeCouleur = GLES20.glGetUniformLocation(mProgram, "vCouleur");
+        refCoordRect = GLES20.glGetAttribLocation(mProgram, "aCoordRect");
+        refMatriceProj = GLES20.glGetUniformLocation(mProgram, "uMatProj");
+        refMatriceTransformation = GLES20.glGetUniformLocation(mProgram,"uMatTrans");
+        refCouleur = GLES20.glGetUniformLocation(mProgram, "vCouleur");
 
-        mPoigneeCoordonneesTexture = GLES20.glGetAttribLocation(mProgram, "aCoordTex");
+        refCoordTexture = GLES20.glGetAttribLocation(mProgram, "aCoordTex");
 
-        mPoigneeDonneesTexture = chargerCalque(context,resourceId);
+        refDataTexture = chargerCalque(context, idCalque);
 
         /* Binding des coordonnées de la texture */
-        mPoigneeVBOCoordonneesTexture = genererBuffer();
-        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, mPoigneeVBOCoordonneesTexture);
+        refBufferCoordTexture = genererBuffer();
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, refBufferCoordTexture);
         float[][] coordTexture = {
                 {0, 0},
                 {1, 0},
@@ -176,8 +176,8 @@ class RectangleRenderer {
                 bufferCoordTexture, GLES20.GL_DYNAMIC_DRAW);
 
         /* Binding des coordonnées du rectangle */
-        mPoigneeVBOCoordonneesRectangle = genererBuffer();
-        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, mPoigneeVBOCoordonneesRectangle);
+        refBufferCoordRect = genererBuffer();
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, refBufferCoordRect);
         float[][] coordRectangle = {
                 {-1.0f/2, -1.0f/2, 0.01f},
                 {1.0f /2, -1.0f/2, 0.01f},
@@ -199,7 +199,7 @@ class RectangleRenderer {
         float profondeur = (float) 0.01;
 
         //Mise à jour du buffer des dimensions du carré
-        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, mPoigneeVBOCoordonneesRectangle);
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, refBufferCoordRect);
         float[][] coordRectangle = {
                 {largeur /2 , hauteur /2 , profondeur}, // haut droit
                 {-largeur /2 , hauteur /2 , profondeur}, // haut gauche
@@ -214,22 +214,22 @@ class RectangleRenderer {
         GLES20.glUseProgram(mProgram);
 
         // Mise à jour des coordonnées du carré
-        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, mPoigneeVBOCoordonneesRectangle);
-        GLES20.glEnableVertexAttribArray(mPoigneeCoordonneesRectangle);
-        GLES20.glVertexAttribPointer(mPoigneeCoordonneesRectangle, 3,
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, refBufferCoordRect);
+        GLES20.glEnableVertexAttribArray(refCoordRect);
+        GLES20.glVertexAttribPointer(refCoordRect, 3,
                 GLES20.GL_FLOAT, false, 0, 0);
 
         //Mise à jour des coordonnées de la texture
-        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, mPoigneeVBOCoordonneesTexture);
-        GLES20.glEnableVertexAttribArray(mPoigneeCoordonneesTexture);
-        GLES20.glVertexAttribPointer(mPoigneeCoordonneesTexture,
+        GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, refBufferCoordTexture);
+        GLES20.glEnableVertexAttribArray(refCoordTexture);
+        GLES20.glVertexAttribPointer(refCoordTexture,
                 2, GLES20.GL_FLOAT, false, 0, 0);
 
         //Mise à jour des matrices de couleur, de transfromation Caméra, et de projection
-        GLES20.glUniform4fv(mPoigneeCouleur, 1, couleur, 0);
-        GLES20.glUniformMatrix4fv(mPoigneeMatriceTransformation, 1, false,
+        GLES20.glUniform4fv(refCouleur, 1, couleur, 0);
+        GLES20.glUniformMatrix4fv(refMatriceTransformation, 1, false,
                 matriceVueCamera.data, 0);
-        GLES20.glUniformMatrix4fv(mPoigneeMatriceProjection, 1, false,
+        GLES20.glUniformMatrix4fv(refMatriceProj, 1, false,
                 matriceProjection.data, 0);
 
         bufferOrdreDessin.position(0);
@@ -241,16 +241,16 @@ class RectangleRenderer {
     /**
      * Fonction qui récupère le calque suivant et le met dans la texture affichée
      * @param contexte nécéssaire pour accéder au fichier bitmap dans les ressources
-     * @param resourceId id du calque a importer
+     * @param idCalque id du calque à importer
      */
-    void imageSuivante(final Context contexte, final int resourceId) {
+    void imageSuivante(final Context contexte, final int idCalque) {
         final BitmapFactory.Options options = new BitmapFactory.Options();
         options.inScaled = false;   // No pre-scaling
         // Read in the resource
-        final Bitmap bitmap = BitmapFactory.decodeResource(contexte.getResources(), resourceId, options);
+        final Bitmap bitmap = BitmapFactory.decodeResource(contexte.getResources(), idCalque, options);
         largeurCalque = bitmap.getWidth();
         hauteurCalque = bitmap.getHeight();
-        majTexture(mPoigneeDonneesTexture,bitmap);
+        majTexture(refDataTexture,bitmap);
     }
 }
 
