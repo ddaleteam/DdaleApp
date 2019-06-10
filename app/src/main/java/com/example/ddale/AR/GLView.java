@@ -10,8 +10,6 @@ package com.example.ddale.AR;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
-import android.util.Log;
-import android.view.View;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
@@ -21,7 +19,7 @@ import javax.microedition.khronos.opengles.GL10;
 
 import cn.easyar.Engine;
 
-public class GLView extends GLSurfaceView implements View.OnClickListener
+public class GLView extends GLSurfaceView
 {
     private final ARManager ARManager;
 
@@ -174,16 +172,23 @@ public class GLView extends GLSurfaceView implements View.OnClickListener
 
     //Gestion du click sur bouton
     /*
-    GLView et ArManager ont des threads différents, on tuilise donc la méthode queueEvent pour
+    GLView et ArManager ont des threads différents, on utilise donc la méthode queueEvent pour
     appeler une fonction de ARManager
      */
-    public void  onClick(View v) {
-        Log.i("GLView", "onClick: ");
+    public void  suivant() {
         queueEvent(new Runnable() {
             // This method will be called on the rendering thread:
             public void run() {
                 ARManager.next();
                 }});
+    }
+
+    public void  precedent() {
+        queueEvent(new Runnable() {
+            // This method will be called on the rendering thread:
+            public void run() {
+                ARManager.next();
+            }});
     }
 
 }

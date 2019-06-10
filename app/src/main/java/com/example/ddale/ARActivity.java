@@ -7,9 +7,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,14 +20,14 @@ import com.example.ddale.AR.GLView;
 
 import cn.easyar.Engine;
 
-public class ARActivity extends AppCompatActivity {
+public class ARActivity extends AppCompatActivity implements View.OnClickListener {
 
     /* ARActivity est une activité qui gère la vue AR et les permissions de la caméra */
     /* Son layout ne contient que la Vue camera + AR */
 
     private GLView glView;
-    private Button btnSuivant;
     private String CAT = "AR";
+    private TextView description;
 
     //Start of region Cycle de Vie
     @Override
@@ -54,22 +56,27 @@ public class ARActivity extends AppCompatActivity {
             Log.e(CAT, "Initialization Failed.");
         }
 
+
+
+        Button btnSuivant = findViewById(R.id.btnSuivant);
+        Button btnPrecedent = findViewById(R.id.btnPrecedent);
+        Button btnInfo = findViewById(R.id.btnInfo);
+        btnSuivant.setOnClickListener(this);
+        btnPrecedent.setOnClickListener(this);
+        btnInfo.setOnClickListener(this);
+
+        description = findViewById(R.id.description);
+
         /*Création de la Vue spéciale AR */
         glView = new GLView(this);
-
-        btnSuivant = new Button(this);
-        btnSuivant.setText(R.string.suivant);
-        btnSuivant.setOnClickListener(glView);
-
-
+        glView.setOnClickListener(this);
         /* Demande des permissions camera */
         requestCameraPermission(new PermissionCallback() {
             @Override
             public void onSuccess() {
                 ViewGroup group = findViewById(R.id.preview);
-                group.addView(glView,new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                                ViewGroup.LayoutParams.MATCH_PARENT));
-                group.addView(btnSuivant,(ViewGroup.LayoutParams.WRAP_CONTENT),(ViewGroup.LayoutParams.WRAP_CONTENT));
+                group.addView(glView,new ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
             }
 
             @Override
@@ -90,6 +97,30 @@ public class ARActivity extends AppCompatActivity {
         super.onPause();
     }
     //end of region Cycle de Vie
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.btnInfo:
+                if(description.getVisibility() == View.INVISIBLE)
+                    description.setVisibility(View.VISIBLE);
+                else
+                    description.setVisibility(View.INVISIBLE);
+                break;
+            case R.id.btnPrecedent:
+                description.setText("description précédente");
+                glView.precedent();
+                break;
+            case R.id.btnSuivant:
+                description.setText("description suivante");
+                glView.suivant();
+                break;
+            default:
+                description.setVisibility(View.INVISIBLE);
+                break;
+        }
+
+    }
 
     //Start of region interface
     private interface PermissionCallback {
