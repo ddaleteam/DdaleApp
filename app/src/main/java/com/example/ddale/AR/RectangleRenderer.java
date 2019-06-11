@@ -1,8 +1,6 @@
 package com.example.ddale.AR;
 
-import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 
@@ -72,65 +70,7 @@ class RectangleRenderer {
                 .order(ByteOrder.nativeOrder()).asShortBuffer().put(ordreDessin);
     }
 
-
-    //region utils
-    /**
-     * Constructeur de buffer vide
-     */
-    private int genererBuffer() {
-        int[] buffer = {0};
-        GLES20.glGenBuffers(1, buffer, 0);
-        return buffer[0];
-    }
-
-    /**
-     * Fonction qui "applatis" les tableaux de coordonnes
-     * pour en faire des tableaux passable dans un buffer (1 ligne)
-     * @param a tableau à applatir
-     * @return un tableau à une ligne contenant les valeurs du tableau initial
-     */
-    private float[] applatir(float[][] a) {
-        int tailleTotale = 0;
-        for (float[] floats : a) {
-            tailleTotale += floats.length;
-        }
-        float[] tableauFinal = new float[tailleTotale];
-        int offset = 0;
-
-        for (float[] floats : a) {
-            System.arraycopy(floats, 0, tableauFinal, offset, floats.length);
-            offset += floats.length;
-        }
-        return tableauFinal;
-    }
-
-    private int chargerCalque(final Context contexte, final int resourceId){
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inScaled = false;   // No pre-scaling
-        // Read in the resource
-        final Bitmap bitmap = BitmapFactory.decodeResource(contexte.getResources(), resourceId, options);
-        largeurCalque = bitmap.getWidth();
-        hauteurCalque = bitmap.getHeight();
-        return creerTexture(bitmap);
-    }
-
-    private int creerTexture(Bitmap bitmap){
-        final int[] refDataTexture = new int[1];
-        GLES20.glGenTextures(1, refDataTexture, 0);
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, refDataTexture[0]);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
-        majTexture(refDataTexture[0], bitmap);
-        return refDataTexture[0];
-    }
-
-    private void majTexture(int refDataTexture, Bitmap bitmap) {
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, refDataTexture);
-        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
-    }
-    // end region utils
-
-    void init(final Context context,final int idCalque) {
+    void init(Bitmap bitmapPremierCalque) {
 
         /* Initialisation du programme OpenGL **/
         mProgram = GLES20.glCreateProgram();
@@ -160,7 +100,7 @@ class RectangleRenderer {
 
         refCoordTexture = GLES20.glGetAttribLocation(mProgram, "aCoordTex");
 
-        refDataTexture = chargerCalque(context, idCalque);
+        refDataTexture = creerTexture(bitmapPremierCalque);
 
         /* Binding des coordonnées de la texture */
         refBufferCoordTexture = genererBuffer();
@@ -238,19 +178,66 @@ class RectangleRenderer {
                 GLES20.GL_UNSIGNED_SHORT, bufferOrdreDessin);
     }
 
+    //region utils
+    /**
+     * Constructeur de buffer vide
+     */
+    private int genererBuffer() {
+        int[] buffer = {0};
+        GLES20.glGenBuffers(1, buffer, 0);
+        return buffer[0];
+    }
+
+    /**
+     * Fonction qui "applatis" les tableaux de coordonnes
+     * pour en faire des tableaux passable dans un buffer (1 ligne)
+     * @param a tableau à applatir
+     * @return un tableau à une ligne contenant les valeurs du tableau initial
+     */
+    private float[] applatir(float[][] a) {
+        int tailleTotale = 0;
+        for (float[] floats : a) {
+            tailleTotale += floats.length;
+        }
+        float[] tableauFinal = new float[tailleTotale];
+        int offset = 0;
+
+        for (float[] floats : a) {
+            System.arraycopy(floats, 0, tableauFinal, offset, floats.length);
+            offset += floats.length;
+        }
+        return tableauFinal;
+    }
+
+    private int creerTexture(Bitmap bitmapCalque){
+        largeurCalque = bitmapCalque.getWidth();
+        hauteurCalque = bitmapCalque.getHeight();
+
+        final int[] refDataTexture = new int[1];
+        GLES20.glGenTextures(1, refDataTexture, 0);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, refDataTexture[0]);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
+
+        majTexture(refDataTexture[0], bitmapCalque);
+        return refDataTexture[0];
+    }
+
+    private void majTexture(int refDataTexture, Bitmap bitmap) {
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, refDataTexture);
+        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
+    }
+
     /**
      * Fonction qui récupère le calque suivant et le met dans la texture affichée
-     * @param contexte nécéssaire pour accéder au fichier bitmap dans les ressources
-     * @param idCalque id du calque à importer
+     *
      */
-    void imageSuivante(final Context contexte, final int idCalque) {
-        final BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inScaled = false;   // No pre-scaling
-        // Read in the resource
-        final Bitmap bitmap = BitmapFactory.decodeResource(contexte.getResources(), idCalque, options);
+    void changerCalque(Bitmap bitmap) {
         largeurCalque = bitmap.getWidth();
         hauteurCalque = bitmap.getHeight();
         majTexture(refDataTexture,bitmap);
     }
+
+    // end region utils
 }
 

@@ -9,6 +9,8 @@
 package com.example.ddale.AR;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.util.Log;
 
@@ -46,18 +48,26 @@ class ARManager
 
     private RectangleRenderer rectangleRenderer;
     private Context contexte;
-    private int idCalque;
     private String CAT = "ARManager";
+    private int[] idCalques;
+    private int nbCalques;
+    private int indexCalqueActif = 0;
 
     /**
      * Constructeur de ARManager
-     * @param contexte : contexte contexte qui sera transmis aux renderer
+     * @param contexte : contexte pour l'accès aux ressources de l'application
      */
     ARManager(Context contexte)
     {
         trackers = new ArrayList<>();
         this.contexte = contexte;
-        idCalque = R.drawable.fresk2048;
+        idCalques = new int[] {
+                R.drawable.fresk2048,
+                R.drawable.fresk4096,
+                R.drawable.fromage,
+                R.drawable.medusecalque,
+        };
+        nbCalques = idCalques.length -1;
     }
 
     //demarrer region chargerCibles
@@ -143,6 +153,25 @@ class ARManager
         }
     }
 
+    void demarrer()
+    {
+        camera.start();
+        streamer.start();
+        camera.setFocusMode(CameraDeviceFocusMode.Continousauto);
+        for (ImageTracker tracker : trackers) {
+            tracker.start();
+        }
+    }
+
+    void arreter()
+    {
+        for (ImageTracker tracker : trackers) {
+            tracker.stop();
+        }
+        streamer.stop();
+        camera.stop();
+    }
+
     void eliminer()
     {
         for (ImageTracker tracker : trackers) {
@@ -165,28 +194,9 @@ class ARManager
             camera = null;
         }
     }
-
-    void demarrer()
-    {
-        camera.start();
-        streamer.start();
-        camera.setFocusMode(CameraDeviceFocusMode.Continousauto);
-        for (ImageTracker tracker : trackers) {
-            tracker.start();
-        }
-    }
-
-    void arreter()
-    {
-        for (ImageTracker tracker : trackers) {
-            tracker.stop();
-        }
-        streamer.stop();
-        camera.stop();
-    }
     //end region cycle de Vie
 
-    //demarrer region Actions
+    //demarrer region Actions du Manager
 
     /**
      * Initialisation des renderer (video et rectangle)
@@ -199,7 +209,7 @@ class ARManager
         cameraRenderer = new Renderer();
 
         rectangleRenderer = new RectangleRenderer();
-        rectangleRenderer.init(contexte, idCalque);
+        rectangleRenderer.init(chargerBitmap(contexte.getResources(),idCalques[indexCalqueActif]));
     }
 
     /**
@@ -301,23 +311,31 @@ class ARManager
      * Passage au calque suivant (à adapter selon les besoins)
      */
     void calqueSuivant() {
-        int nextId = R.drawable.fres;
-        switch(idCalque){
-            case R.drawable.fromage :
-                nextId = R.drawable.fresk2048;
-                idCalque = nextId;
-                break;
-            case R.drawable.fresk2048 :
-                nextId = R.drawable.medusecalque;
-                idCalque = nextId;
-                break;
-            case R.drawable.medusecalque :
-                nextId = R.drawable.fromage;
-                idCalque = nextId;
-                break;
-        }
-        rectangleRenderer.imageSuivante(contexte,nextId);
+        indexCalqueActif = (indexCalqueActif == nbCalques) ? 0 : indexCalqueActif +1;
+        Bitmap nouveauCalque = chargerBitmap(contexte.getResources(), idCalques[indexCalqueActif]);
+        rectangleRenderer.changerCalque(nouveauCalque);
     }
 
-    //end region Actions
+    /**
+     * Passage au calque précédent (à adapter selon les besoins)
+     */
+    void calquePrecedent() {
+        indexCalqueActif = (indexCalqueActif == 0) ? nbCalques : indexCalqueActif -1;
+        Bitmap nouveauCalque = chargerBitmap(contexte.getResources(), idCalques[indexCalqueActif]);
+        rectangleRenderer.changerCalque(nouveauCalque);
+    }
+    //end region Actions du Manager
+
+
+    /**
+     * Charge le bitmap d'une image située dans les ressources de l'application
+     * @param resources accès aux ressources de l'application
+     * @param idImage id de l'image dans les ressources de l'application (R.id.image)
+     * @return un bitmap correspondant à l'image
+     */
+    private Bitmap chargerBitmap(android.content.res.Resources resources , int idImage) {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inScaled = false; //Pas de mise à l'échelle
+        return BitmapFactory.decodeResource(resources, idImage, options);
+    }
 }

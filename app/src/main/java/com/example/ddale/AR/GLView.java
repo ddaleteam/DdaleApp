@@ -187,7 +187,7 @@ public class GLView extends GLSurfaceView
         queueEvent(new Runnable() {
             // This method will be called on the rendering thread:
             public void run() {
-                ARManager.calqueSuivant();
+                ARManager.calquePrecedent();
             }});
     }
 
