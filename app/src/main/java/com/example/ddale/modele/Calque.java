@@ -1,9 +1,11 @@
 package com.example.ddale.modele;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * <b>Classe Calque</b>
  * Cette classe represente un calque
- * Un calque peut etre de type 'anecdote' ou bien 'composition'
+ * Un calque peut etre de typeCalque 'anecdote' ou bien 'composition'
  *
  * @author ddaleteam
  * @version 1.0
@@ -14,19 +16,23 @@ public class Calque {
      * <b>id</b> represente l'identifiant unique du calque
      * Cet identifiant est instancie par l'API
      */
+    @SerializedName("id")
     private int id;
     /**
      * <b>description</b> represente le texte associe au calque
      */
+    @SerializedName("description")
     private String description;
     /**
      * <b>urlCalque</b> represente le texte associe au calque
      */
+    @SerializedName("urlCalque")
     private String urlCalque;
     /**
-     * <b>type</b> represente le type du calque
+     * <b>typeCalque</b> represente le typeCalque du calque
      */
-    private String type;
+    @SerializedName("typeCalque")
+    private String typeCalque;
 
     /**
      * Constructeur par defaut
@@ -35,19 +41,19 @@ public class Calque {
     public Calque() {
         urlCalque = "";
         description = "";
-        type = "";
+        typeCalque = "";
     }
 
     /**
      * Constructeur par parametres
      * @param description la description associee a l'anecdote
      * @param urlCalque l'url du calque
-     * @param type le type du calque
+     * @param type le typeCalque du calque
      */
     public Calque(String description, String urlCalque, String type) {
         this.description = description;
         this.urlCalque = urlCalque;
-        this.type = type;
+        this.typeCalque = type;
     }
 
     /**
@@ -75,19 +81,19 @@ public class Calque {
     }
 
     /**
-     * Accesseur du type
-     * @return le type du calque
+     * Accesseur du typeCalque
+     * @return le typeCalque du calque
      */
-    public String getType() {
-        return type;
+    public String getTypeCalque() {
+        return typeCalque;
     }
 
     /**
-     * Mutateur du type du calque
-     * @param type le nouveau type
+     * Mutateur du typeCalque du calque
+     * @param typeCalque le nouveau typeCalque
      */
-    public void setType(String type) {
-        this.type = type;
+    public void setTypeCalque(String typeCalque) {
+        this.typeCalque = typeCalque;
     }
 
     /**
@@ -114,7 +120,7 @@ public class Calque {
     public String toString() {
         return "{\"anecdote\": {" +
                 "\"id\": " + id +
-                ", \"type\": " + type +
+                ", \"typeCalque\": " + typeCalque +
                 ", \"urlCalque\": " + urlCalque +
                 ", \"description\": \"" + description + "\"" +
                 "}}";

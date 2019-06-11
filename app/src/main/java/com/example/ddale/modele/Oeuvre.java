@@ -1,5 +1,7 @@
 package com.example.ddale.modele;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -17,47 +19,66 @@ public class Oeuvre {
      * <b>id</b> represente l'identifiant unique de l'oeuvre
      * Cet identifiant est instancie par l'API
      */
+    @SerializedName("id")
     private int id;
     /**
      * <b>position</b> represente la position de l'oeuvre dans le musee
      */
+    @SerializedName("position")
     private int position;
     /**
      * <b>titre</b> represente le titre de l'oeuvre
      */
+    @SerializedName("titre")
     private String titre;
     /**
      * <b>auteur</b> represente l'auteur de l'oeuvre
      */
+    @SerializedName("auteur")
     private String auteur;
     /**
-     * <b>date</b> represente la date de creation de l'oeuvre
+     * <b>annee</b> represente la annee de creation de l'oeuvre
      */
-    private String date;
+    @SerializedName("annee")
+    private String annee;
     /**
-     * <b>dimensions</b> represente les dimensions de l'oeuvre (hauteur x largeur pour un tableau)
+     * <b>hauteur</b> represente la hauteur de l'oeuvre (pour un tableau)
      */
-    private String dimensions;
+    @SerializedName("hauteur")
+    private String hauteur;
+
+    /**
+     * <b>largeur</b> represente la largeur de l'oeuvre (pour un tableau)
+     */
+    @SerializedName("largeur")
+    private String largeur;
+
+
     /**
      * <b>technique</b> represente la technique utilisee pour creer l'oeuvre
      */
+    @SerializedName("technique")
     private String technique;
     /**
-     * <b>urlImageCible</b> represente l'URL de l'image de l'oeuvre a reconnaitre
+     * <b>urlCible</b> represente l'URL de l'image de l'oeuvre a reconnaitre
      */
-    private String urlImageCible;
+    @SerializedName("urlCible")
+    private String urlCible;
     /**
      * <b>calques</b> represente la liste des calques associees a l'oeuvre
      */
+    @SerializedName("calques")
     private List<Calque> calques;
     /**
      * <b>audio</b> contient une URL dirigeant vers le fichier audio associe a l'oeuvre
      */
+    @SerializedName("audio")
     private String audio;
     /**
      * <b>composition</b> contient une URL dirigeant vers les fichiers images associes a l'oeuvre
      * Ces images sont superposees a l'oeuvre lors de l'affichage (realite augmentee)
      */
+    @SerializedName("composition")
     private String composition;
 
     /**
@@ -69,10 +90,11 @@ public class Oeuvre {
         position = 0;
         titre = "";
         auteur = "";
-        date = "";
-        dimensions = "";
+        annee = "";
+        largeur = "";
+        hauteur = "";
         technique = "";
-        urlImageCible = "";
+        urlCible = "";
         calques = new ArrayList<>();
         audio = "";
         composition = "";
@@ -84,22 +106,24 @@ public class Oeuvre {
      * @param position sa position
      * @param titre son titre
      * @param auteur son auteur
-     * @param date sa date de creation
-     * @param dimensions ses dimensions
+     * @param date sa annee de creation
+     * @param hauteur la hauteur
+     * @param largeur la largeur
      * @param technique la technique utilisee
      * @param urlImageCible l'URL de l'image de l'oeuvre cible
      * @param audio le lien vers le fichier audio
      * @param composition le lien vers les fichiers images
      * La liste des calques est vide
      */
-    public Oeuvre(int position, String titre, String auteur, String date, String dimensions, String technique, String urlImageCible, String audio, String composition) {
+    public Oeuvre(int position, String titre, String auteur, String date, String hauteur, String largeur, String technique, String urlImageCible, String audio, String composition) {
         this.position = position;
         this.titre = titre;
         this.auteur = auteur;
-        this.date = date;
-        this.dimensions = dimensions;
+        this.annee = date;
+        this.hauteur = hauteur;
+        this.largeur = largeur;
         this.technique = technique;
-        this.urlImageCible = urlImageCible;
+        this.urlCible = urlImageCible;
         this.audio = audio;
         this.composition = composition;
         calques = new ArrayList<>();
@@ -110,25 +134,40 @@ public class Oeuvre {
      * @param position sa position
      * @param titre son titre
      * @param auteur son auteur
-     * @param date sa date de creation
-     * @param dimensions ses dimensions
+     * @param date sa annee de creation
+     * @param hauteur la hauteur
+     * @param largeur la largeur
      * @param technique la technique utilisee
      * @param urlImageCible l'URL de l'image de l'oeuvre cible
      * @param calques la liste des calques
      * @param audio le lien vers le fichier audio
      * @param composition le lien vers les fichiers images
      */
-    public Oeuvre(int position, String titre, String auteur, String date, String dimensions, String technique, String urlImageCible, List<Calque> calques, String audio, String composition) {
+    public Oeuvre(int position, String titre, String auteur, String date, String hauteur, String largeur, String technique, String urlImageCible, List<Calque> calques, String audio, String composition) {
         this.position = position;
         this.titre = titre;
         this.auteur = auteur;
-        this.date = date;
-        this.dimensions = dimensions;
+        this.annee = date;
+        this.hauteur = hauteur;
+        this.largeur = largeur;
         this.technique = technique;
-        this.urlImageCible = urlImageCible;
+        this.urlCible = urlImageCible;
         this.calques = calques;
         this.audio = audio;
         this.composition = composition;
+    }
+    public Oeuvre( Oeuvre oeuvre){
+        this.position = oeuvre.position;
+        this.titre = oeuvre.titre;
+        this.auteur = oeuvre.auteur;
+        this.annee = oeuvre.annee;
+        this.hauteur = oeuvre.hauteur;
+        this.largeur = oeuvre.largeur;
+        this.technique = oeuvre.technique;
+        this.urlCible = oeuvre.urlCible;
+        this.calques = oeuvre.calques;
+        this.audio = oeuvre.audio;
+        this.composition = oeuvre.composition;
     }
 
     /**
@@ -188,35 +227,51 @@ public class Oeuvre {
     }
 
     /**
-     * Accesseur de la date
-     * @return la date de creation de l'oeuvre
+     * Accesseur de la annee
+     * @return la annee de creation de l'oeuvre
      */
-    public String getDate() {
-        return date;
+    public String getAnnee() {
+        return annee;
     }
 
     /**
-     * Mutateur de la date
-     * @param date la nouvelle date de creation a attribuer
+     * Mutateur de la annee
+     * @param annee la nouvelle annee de creation a attribuer
      */
-    public void setDate(String date) {
-        this.date = date;
+    public void setAnnee(String annee) {
+        this.annee = annee;
     }
 
     /**
-     * Accesseur des dimensions
-     * @return les dimensions de l'oeuvre
+     * Accesseur da la hauteur
+     * @return la hauteur de l'oeuvre
      */
-    public String getDimensions() {
-        return dimensions;
+    public String getHauteur() {
+        return hauteur;
     }
 
     /**
-     * Mutateur des dimensions
-     * @param dimensions les nouvelles dimensions a attribuer
+     * Mutateur de la hauteur
+     * @param hauteur la nouvelle hauteur à attribuer
      */
-    public void setDimensions(String dimensions) {
-        this.dimensions = dimensions;
+    public void setHauteur(String hauteur) {
+        this.hauteur = hauteur;
+    }
+
+    /**
+     * Accesseur de la hauteur
+     * @return la hauteur de l'oeuvre
+     */
+    public String getLargeur() {
+        return largeur;
+    }
+
+    /**
+     * Mutateur de la largeur
+     * @param largeur la nouvelle largeur à attribuer
+     */
+    public void setLargeur(String largeur) {
+        this.largeur = largeur;
     }
 
     /**
@@ -239,16 +294,16 @@ public class Oeuvre {
      * Accesseur de l'URL
      * @return l'URL de l'image de l'oeuvre cible
      */
-    public String getUrlImageCible() {
-        return urlImageCible;
+    public String getUrlCible() {
+        return urlCible;
     }
 
     /**
      * Mutateur de l'URL de l'image de l'ouvre cible
-     * @param urlImageCible la nouvelle URL a attribuer
+     * @param urlCible la nouvelle URL a attribuer
      */
-    public void setUrlImageCible(String urlImageCible) {
-        this.urlImageCible = urlImageCible;
+    public void setUrlCible(String urlCible) {
+        this.urlCible = urlCible;
     }
 
     /**
@@ -310,10 +365,11 @@ public class Oeuvre {
                 ", \"position\": \"" + position + '\"' +
                 ", \"titre\": \"" + titre + '\"' +
                 ", \"auteur\": \"" + auteur + '\"' +
-                ", \"date\": \"" + date + '\"' +
-                ", \"dimensions\": \"" + dimensions + '\"' +
+                ", \"annee\": \"" + annee + '\"' +
+                ", \"hauteur\": \"" + hauteur + '\"' +
+                ", \"largeur\": \"" + largeur + '\"' +
                 ", \"technique\": \"" + technique + '\"' +
-                ", \"urlImageCible\": \"" + urlImageCible + '\"' +
+                ", \"urlCible\": \"" + urlCible + '\"' +
                 ", \"calques\": [";
         Iterator<Calque> iterator = calques.iterator();
         while (iterator.hasNext()) {
