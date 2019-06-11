@@ -38,15 +38,16 @@ class ARManager
     private CameraDevice camera;
     private CameraFrameStreamer streamer;
     private ArrayList<ImageTracker> trackers;
-    private Renderer videobg_renderer;
-    private boolean viewport_changed = false;
-    private Vec2I view_size = new Vec2I(0, 0);
+    private Renderer cameraRenderer;
+    private boolean viewportChanged = false;
+    private Vec2I tailleVue = new Vec2I(0, 0);
     private int rotation = 0;
     private Vec4I viewport = new Vec4I(0, 0, 1280, 720);
 
     private RectangleRenderer rectangleRenderer;
-    private Context context;
+    private Context contexte;
     private int idCalque;
+    private String CAT = "ARManager";
 
     /**
      * Constructeur de ARManager
@@ -55,14 +56,14 @@ class ARManager
     ARManager(Context contexte)
     {
         trackers = new ArrayList<>();
-        context = contexte;
+        this.contexte = contexte;
         idCalque = R.drawable.fresk2048;
     }
 
-    //start region chargerCibles
-    private void loadFromImage(ImageTracker tracker, String path)
+    //demarrer region chargerCibles
+    private void chargerDepuisImage(ImageTracker tracker, String path)
     {
-        ImageTarget target = new ImageTarget();
+        ImageTarget cible = new ImageTarget();
         String jstr = "{\n"
             + "  \"images\" :\n"
             + "  [\n"
@@ -72,51 +73,51 @@ class ARManager
             + "    }\n"
             + "  ]\n"
             + "}";
-        target.setup(jstr, StorageType.Assets | StorageType.Json, "");
-        tracker.loadTarget(target, new FunctorOfVoidFromPointerOfTargetAndBool() {
+        cible.setup(jstr, StorageType.Assets | StorageType.Json, "");
+        tracker.loadTarget(cible, new FunctorOfVoidFromPointerOfTargetAndBool() {
             @Override
-            public void invoke(Target target, boolean status) {
-                Log.i("ARManager", String.format("load target (%b): %s (%d)", 
-                        status, target.name(), target.runtimeID()));
+            public void invoke(Target cible, boolean status) {
+                Log.i(CAT, String.format("load cible (%b): %s (%d)",
+                        status, cible.name(), cible.runtimeID()));
             }
         });
     }
 
-    private void loadFromJsonFile(ImageTracker tracker, String path, String targetname)
+    private void chargerDepuisJson(ImageTracker tracker, String path, String ciblename)
     {
-        ImageTarget target = new ImageTarget();
-        target.setup(path, StorageType.Assets, targetname);
-        tracker.loadTarget(target, new FunctorOfVoidFromPointerOfTargetAndBool() {
+        ImageTarget cible = new ImageTarget();
+        cible.setup(path, StorageType.Assets, ciblename);
+        tracker.loadTarget(cible, new FunctorOfVoidFromPointerOfTargetAndBool() {
             @Override
-            public void invoke(Target target, boolean status) {
-                Log.i("ARManager", String.format("load target (%b): %s (%d)", 
-                        status, target.name(), target.runtimeID()));
+            public void invoke(Target cible, boolean status) {
+                Log.i(CAT, String.format("load cible (%b): %s (%d)",
+                        status, cible.name(), cible.runtimeID()));
             }
         });
     }
 
-    private void loadAllFromJsonFile(ImageTracker tracker, String path)
+    private void chargerTousJson(ImageTracker tracker, String path)
     {
-        for (ImageTarget target : ImageTarget.setupAll(path, StorageType.Assets)) {
-            tracker.loadTarget(target, new FunctorOfVoidFromPointerOfTargetAndBool() {
+        for (ImageTarget cible : ImageTarget.setupAll(path, StorageType.Assets)) {
+            tracker.loadTarget(cible, new FunctorOfVoidFromPointerOfTargetAndBool() {
                 @Override
-                public void invoke(Target target, boolean status) {
-                    Log.i("ARManager", String.format("load target (%b): %s (%d)", 
-                            status, target.name(), target.runtimeID()));
+                public void invoke(Target cible, boolean status) {
+                    Log.i(CAT, String.format("load cible (%b): %s (%d)",
+                            status, cible.name(), cible.runtimeID()));
                 }
             });
         }
     }
     //end region chargerCibles
 
+    //demarrer region cycle de Vie
     /**
      * fonction d'initialisation du Manager
      * initialise la camera, sa taille et le streamer (qui transmet les images)
      *
      * @return un boolean qui qualifie l'état de l'initialisation
      */
-    //start region cycle de Vie
-    boolean initialize()
+    boolean initialiser()
     {
         camera = new CameraDevice();
         streamer = new CameraFrameStreamer();
@@ -126,19 +127,23 @@ class ARManager
         status = camera.open(CameraDeviceType.Default);
         camera.setSize(new Vec2I(1280, 720));
 
-        if (!status) { return status; }
-        ImageTracker tracker = new ImageTracker();
-        tracker.attachStreamer(streamer);
+        if (!status)
+            return status;
 
-        loadFromImage(tracker, "stones.jpg");
-        loadFromImage(tracker, "smallmeduse.jpeg");
-        loadFromImage(tracker, "sammllrezo.jpeg");
-        trackers.add(tracker);
+        else{
+            ImageTracker tracker = new ImageTracker();
+            tracker.attachStreamer(streamer);
 
-        return status;
+            chargerDepuisImage(tracker, "stones.jpg");
+            chargerDepuisImage(tracker, "smallmeduse.jpeg");
+            chargerDepuisImage(tracker, "sammllrezo.jpeg");
+            trackers.add(tracker);
+
+            return status;
+        }
     }
 
-    void dispose()
+    void eliminer()
     {
         for (ImageTracker tracker : trackers) {
             tracker.dispose();
@@ -147,9 +152,9 @@ class ARManager
 
         rectangleRenderer = null;
 
-        if (videobg_renderer != null) {
-            videobg_renderer.dispose();
-            videobg_renderer = null;
+        if (cameraRenderer != null) {
+            cameraRenderer.dispose();
+            cameraRenderer = null;
         }
         if (streamer != null) {
             streamer.dispose();
@@ -161,45 +166,40 @@ class ARManager
         }
     }
 
-    boolean start()
+    void demarrer()
     {
-        boolean status;
-        status = (camera != null) && camera.start();
-        status &= (streamer != null) && streamer.start();
-        assert camera != null;
+        camera.start();
+        streamer.start();
         camera.setFocusMode(CameraDeviceFocusMode.Continousauto);
         for (ImageTracker tracker : trackers) {
-            status &= tracker.start();
+            tracker.start();
         }
-        return status;
     }
 
-    boolean stop()
+    void arreter()
     {
-        boolean status = true;
         for (ImageTracker tracker : trackers) {
-            status &= tracker.stop();
+            tracker.stop();
         }
-        status &= (streamer != null) && streamer.stop();
-        status &= (camera != null) && camera.stop();
-        return status;
+        streamer.stop();
+        camera.stop();
     }
     //end region cycle de Vie
 
-    //start region Actions
+    //demarrer region Actions
 
     /**
-     * Initialisation des renderer (video et
+     * Initialisation des renderer (video et rectangle)
      */
-    void initGL()
+    void initialiserGL()
     {
-        if (videobg_renderer != null) {
-            videobg_renderer.dispose();
+        if (cameraRenderer != null) {
+            cameraRenderer.dispose();
         }
-        videobg_renderer = new Renderer();
+        cameraRenderer = new Renderer();
 
         rectangleRenderer = new RectangleRenderer();
-        rectangleRenderer.init(context, idCalque);
+        rectangleRenderer.init(contexte, idCalque);
     }
 
     /**
@@ -207,24 +207,25 @@ class ARManager
      * @param width nouvelle largeur
      * @param height nouvelle hauteur
      */
-    void resizeGL(int width, int height)
+    void redimensionnerGL(int width, int height)
     {
-        view_size = new Vec2I(width, height);
-        viewport_changed = true;
+        tailleVue = new Vec2I(width, height);
+        viewportChanged = true;
     }
 
     /**
      * Mise a jour du viewPort
+     * Gestion de tailleVue
      */
-    private void updateViewport()
+    private void majViewport()
     {
         CameraCalibration calib = camera != null ? camera.cameraCalibration() : null;
         int rotation = calib != null ? calib.rotation() : 0;
         if (rotation != this.rotation) {
             this.rotation = rotation;
-            viewport_changed = true;
+            viewportChanged = true;
         }
-        if (viewport_changed) {
+        if (viewportChanged) {
             Vec2I size = new Vec2I(1, 1);
             if ((camera != null) && camera.isOpened()) {
                 size = camera.size();
@@ -232,17 +233,17 @@ class ARManager
             if (rotation == 90 || rotation == 270) {
                 size = new Vec2I(size.data[1], size.data[0]);
             }
-            float scaleRatio = Math.max((float) view_size.data[0] / (float) size.data[0], 
-                    (float) view_size.data[1] / (float) size.data[1]);
+            float scaleRatio = Math.max((float) tailleVue.data[0] / (float) size.data[0],
+                    (float) tailleVue.data[1] / (float) size.data[1]);
             Vec2I viewport_size = new Vec2I(Math.round(size.data[0] * scaleRatio), 
                                              Math.round(size.data[1] * scaleRatio));
-            viewport = new Vec4I((view_size.data[0] - viewport_size.data[0]) / 2, 
-                                (view_size.data[1] - viewport_size.data[1]) / 2, 
+            viewport = new Vec4I((tailleVue.data[0] - viewport_size.data[0]) / 2,
+                                (tailleVue.data[1] - viewport_size.data[1]) / 2,
                                 viewport_size.data[0],
                                 viewport_size.data[1]);
 
             if ((camera != null) && camera.isOpened())
-                viewport_changed = false;
+                viewportChanged = false;
         }
     }
 
@@ -254,11 +255,11 @@ class ARManager
         GLES20.glClearColor(1.f, 1.f, 1.f, 1.f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
-        if (videobg_renderer != null) {
-            Vec4I default_viewport = new Vec4I(0, 0, view_size.data[0], view_size.data[1]);
+        if (cameraRenderer != null) {
+            Vec4I default_viewport = new Vec4I(0, 0, tailleVue.data[0], tailleVue.data[1]);
             GLES20.glViewport(default_viewport.data[0], default_viewport.data[1], 
                     default_viewport.data[2], default_viewport.data[3]);
-            if (videobg_renderer.renderErrorMessage(default_viewport)) {
+            if (cameraRenderer.renderErrorMessage(default_viewport)) {
                 return;
             }
         }
@@ -266,26 +267,26 @@ class ARManager
         if (streamer == null) { return; }
         Frame frame = streamer.peek();
         try {
-            updateViewport();
+            majViewport();
             GLES20.glViewport(viewport.data[0], viewport.data[1], 
                     viewport.data[2], viewport.data[3]);
 
-            if (videobg_renderer != null) {
-                videobg_renderer.render(frame, viewport);
+            if (cameraRenderer != null) {
+                cameraRenderer.render(frame, viewport);
             }
 
-            for (TargetInstance targetInstance : frame.targetInstances()) {
-                int status = targetInstance.status();
+            for (TargetInstance instanceCible : frame.targetInstances()) {
+                int status = instanceCible.status();
                 if (status == TargetStatus.Tracked) {
-                    Target target = targetInstance.target();
-                    ImageTarget imagetarget = 
-                            target instanceof ImageTarget ? (ImageTarget) (target) : null;
-                    if (imagetarget == null) {
+                    Target cible = instanceCible.target();
+                    ImageTarget imageCible =
+                            cible instanceof ImageTarget ? (ImageTarget) (cible) : null;
+                    if (imageCible == null) {
                         continue;
                     }
                     if (rectangleRenderer != null) {
                         rectangleRenderer.render(camera.projectionGL(0.2f, 500.f),
-                                targetInstance.poseGL(), imagetarget.size());
+                                instanceCible.poseGL(), imageCible.size());
                     }
 
                 }
@@ -299,7 +300,7 @@ class ARManager
     /**
      * Passage au calque suivant (à adapter selon les besoins)
      */
-    void next() {
+    void calqueSuivant() {
         int nextId = R.drawable.fres;
         switch(idCalque){
             case R.drawable.fromage :
@@ -315,7 +316,7 @@ class ARManager
                 idCalque = nextId;
                 break;
         }
-        rectangleRenderer.imageSuivante(context,nextId);
+        rectangleRenderer.imageSuivante(contexte,nextId);
     }
 
     //end region Actions

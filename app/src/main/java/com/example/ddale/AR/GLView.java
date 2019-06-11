@@ -42,7 +42,7 @@ public class GLView extends GLSurfaceView
             @Override
             public void onSurfaceCreated(GL10 gl, EGLConfig config) {
                 synchronized (ARManager) {
-                    ARManager.initGL();
+                    ARManager.initialiserGL();
                 }
 
             }
@@ -55,7 +55,7 @@ public class GLView extends GLSurfaceView
             @Override
             public void onSurfaceChanged(GL10 gl, int w, int h) {
                 synchronized (ARManager) {
-                    ARManager.resizeGL(w, h);
+                    ARManager.redimensionnerGL(w, h);
                 }
             }
 
@@ -79,8 +79,8 @@ public class GLView extends GLSurfaceView
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         synchronized (ARManager) {
-            if (ARManager.initialize()) {
-                ARManager.start();
+            if (ARManager.initialiser()) {
+                ARManager.demarrer();
             }
         }
     }
@@ -88,8 +88,8 @@ public class GLView extends GLSurfaceView
     @Override
     protected void onDetachedFromWindow() {
         synchronized (ARManager) {
-            ARManager.stop();
-            ARManager.dispose();
+            ARManager.arreter();
+            ARManager.eliminer();
         }
         super.onDetachedFromWindow();
     }
@@ -179,7 +179,7 @@ public class GLView extends GLSurfaceView
         queueEvent(new Runnable() {
             // This method will be called on the rendering thread:
             public void run() {
-                ARManager.next();
+                ARManager.calqueSuivant();
                 }});
     }
 
@@ -187,7 +187,7 @@ public class GLView extends GLSurfaceView
         queueEvent(new Runnable() {
             // This method will be called on the rendering thread:
             public void run() {
-                ARManager.next();
+                ARManager.calqueSuivant();
             }});
     }
 
