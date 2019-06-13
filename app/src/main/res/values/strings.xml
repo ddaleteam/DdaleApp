@@ -6,5 +6,7 @@
         Que voulez-vous faire aujourd\'hui ? </string>
     <string name="suivant">Suivant</string>
     <string name="precedent">Précédent</string>
+    <string name="consigneQR">This your captain speaking.
+        \n\nPlease scan the QR Code next to the tableau.</string>
 
 </resources>
