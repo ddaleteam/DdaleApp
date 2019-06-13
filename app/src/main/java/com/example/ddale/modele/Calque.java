@@ -27,6 +27,10 @@ public class Calque {
      * <b>type</b> represente le type du calque
      */
     private String type;
+    /**
+     * <b>urlAudio</b> contient une URL dirigeant vers le fichier audio associe au calque
+     */
+    private String urlAudio;
 
     /**
      * Constructeur par defaut
@@ -36,6 +40,7 @@ public class Calque {
         urlCalque = "";
         description = "";
         type = "";
+        urlAudio = "";
     }
 
     /**
@@ -43,11 +48,13 @@ public class Calque {
      * @param description la description associee a l'anecdote
      * @param urlCalque l'url du calque
      * @param type le type du calque
+     * @param urlAudio l'url du fichier audio associe au calque
      */
-    public Calque(String description, String urlCalque, String type) {
+    public Calque(String description, String urlCalque, String type, String urlAudio) {
         this.description = description;
         this.urlCalque = urlCalque;
         this.type = type;
+        this.urlAudio = urlAudio;
     }
 
     /**
@@ -70,7 +77,7 @@ public class Calque {
      * Mutateur de l'URL du calque
      * @param urlCalque la nouvelle URL
      */
-    public void setAbscisse(String urlCalque) {
+    public void setUrlCalque(String urlCalque) {
         this.urlCalque = urlCalque;
     }
 
@@ -100,10 +107,26 @@ public class Calque {
 
     /**
      * Mutateur de la description associee a l'anecdote
-     * @param description la nouvelle descritpion a associer
+     * @param description la nouvelle description a associer
      */
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    /**
+     * Accesseur de l'URL du fichier audio
+     * @return l'URL associee au fichier audio
+     */
+    public String getUrlAudio() {
+        return urlAudio;
+    }
+
+    /**
+     * Mutateur de l'URL du fichier audio
+     * @param urlAudio la nouvelle URL a associer
+     */
+    public void setUrlAudio(String urlAudio) {
+        this.urlAudio = urlAudio;
     }
 
     /**
@@ -116,6 +139,7 @@ public class Calque {
                 "\"id\": " + id +
                 ", \"type\": " + type +
                 ", \"urlCalque\": " + urlCalque +
+                ", \"urlAudio\": " + urlAudio +
                 ", \"description\": \"" + description + "\"" +
                 "}}";
     }
