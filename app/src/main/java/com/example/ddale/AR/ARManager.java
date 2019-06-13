@@ -324,6 +324,10 @@ class ARManager
         Bitmap nouveauCalque = chargerBitmap(contexte.getResources(), idCalques[indexCalqueActif]);
         rectangleRenderer.changerCalque(nouveauCalque);
     }
+
+    void notifier() {
+        Log.i(CAT, "notifier: ");
+    }
     //end region Actions du Manager
 
 
@@ -338,4 +342,6 @@ class ARManager
         options.inScaled = false; //Pas de mise à l'échelle
         return BitmapFactory.decodeResource(resources, idImage, options);
     }
+
+
 }

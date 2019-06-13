@@ -2,6 +2,7 @@ package com.example.ddale;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.AlertDialog;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,9 +17,15 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.ddale.API.APIClient;
+import com.example.ddale.API.APIInterface;
 import com.example.ddale.AR.GLView;
+import com.example.ddale.modele.Oeuvre;
 
 import cn.easyar.Engine;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ARActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -28,11 +35,18 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
     private GLView glView;
     private String CAT = "AR";
     private TextView description;
+    private Oeuvre oeuvre;
+    private int idOeuvre;
 
     //Start of region Cycle de Vie
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        idOeuvre = getIntent().getIntExtra("idOeuvre", 1);
+        Log.i(CAT, "onCreate: " + idOeuvre);
+
+
         setContentView(R.layout.activity_ar);
 
         /* Désactive la mise en veille automatique de l'écran */
@@ -68,8 +82,8 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
         description = findViewById(R.id.description);
 
         /*Création de la Vue spéciale AR */
-        glView = new GLView(this);
-        glView.setOnClickListener(this);
+        glView = new GLView(ARActivity.this);
+        glView.setOnClickListener(ARActivity.this);
         /* Demande des permissions camera */
         requestCameraPermission(new PermissionCallback() {
             @Override
@@ -86,6 +100,12 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        recupererOeuvre(idOeuvre);
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         if (glView != null) { glView.onResume(); }
@@ -98,29 +118,6 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
     }
     //end of region Cycle de Vie
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.btnInfo:
-                if(description.getVisibility() == View.INVISIBLE)
-                    description.setVisibility(View.VISIBLE);
-                else
-                    description.setVisibility(View.INVISIBLE);
-                break;
-            case R.id.btnPrecedent:
-                description.setText("description précédente");
-                glView.precedent();
-                break;
-            case R.id.btnSuivant:
-                description.setText("description suivante");
-                glView.suivant();
-                break;
-            default:
-                description.setVisibility(View.INVISIBLE);
-                break;
-        }
-
-    }
 
     //Start of region interface
     private interface PermissionCallback {
@@ -172,6 +169,63 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
     }
     // end of region fonctions utilitaires
 
+    //Debut de region API
+    public void recupererOeuvre(int id){
+        APIInterface api = APIClient.createService(APIInterface.class);
+        Call<Oeuvre> call = api.appelAPIOeuvre(id);
+        call.enqueue(new Callback<Oeuvre>() {
+            @Override
+            public void onResponse(Call<Oeuvre> call, Response<Oeuvre> response) {
+                if (response.isSuccessful()) {
+                    Log.i("Oeuvre : " +CAT,response.body().toString());
+                    ARActivity.this.oeuvre = new Oeuvre(response.body());
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ARActivity.this);
+                    builder.setTitle("Scan Result");
+                    builder.setMessage("Titre de l'oeuvre : " +oeuvre.getTitre()+"\nEt l'incroyable auteur : " +oeuvre.getAuteur());
+                    AlertDialog alert1 = builder.create();
+                    alert1.show();
+
+                    glView.notifier();
+
+                } else {
+                    Log.i(CAT,"Erreur lors de l'appel à l'API pour récupérer l'oeuvre");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Oeuvre> call, Throwable t) {
+                Log.i(CAT, "Erreur lors de l'appel à l'API pour récupérer l'oeuvre : timeout");
+            }
+        });
+        Log.i(CAT, "fin");
+    }
+    //Fin de region API
+
+    //Debut region onClick
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.btnInfo:
+                if(description.getVisibility() == View.INVISIBLE)
+                    description.setVisibility(View.VISIBLE);
+                else
+                    description.setVisibility(View.INVISIBLE);
+                break;
+            case R.id.btnPrecedent:
+                description.setText("description précédente");
+                glView.precedent();
+                break;
+            case R.id.btnSuivant:
+                description.setText("description suivante");
+                glView.suivant();
+                break;
+            default:
+                description.setVisibility(View.INVISIBLE);
+                break;
+        }
+
+    }
+    //Fin region onClick
 
 
 }

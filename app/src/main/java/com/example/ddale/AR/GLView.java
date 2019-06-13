@@ -107,6 +107,8 @@ public class GLView extends GLSurfaceView
         Engine.onPause();
         super.onPause();
     }
+
+
     //End of region Cycle de Vie de la vue
 
     //Start of Region Classes Internes
@@ -189,6 +191,14 @@ public class GLView extends GLSurfaceView
             public void run() {
                 ARManager.calquePrecedent();
             }});
+    }
+
+    public void notifier() {
+        queueEvent( new Runnable() {
+        // This method will be called on the rendering thread:
+        public void run() {
+            ARManager.notifier();
+        }});
     }
 
 }
