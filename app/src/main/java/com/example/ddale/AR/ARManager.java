@@ -141,14 +141,13 @@ class ARManager
             return status;
 
         else{
+            /*
             ImageTracker tracker = new ImageTracker();
             tracker.attachStreamer(streamer);
-
             chargerDepuisImage(tracker, "stones.jpg");
-            chargerDepuisImage(tracker, "smallmeduse.jpeg");
             chargerDepuisImage(tracker, "sammllrezo.jpeg");
             trackers.add(tracker);
-
+            */
             return status;
         }
     }
@@ -327,6 +326,15 @@ class ARManager
 
     void notifier() {
         Log.i(CAT, "notifier: ");
+
+        ImageTracker tracker = new ImageTracker();
+        tracker.attachStreamer(streamer);
+
+        chargerDepuisImage(tracker, "smallmeduse.jpeg");
+
+        trackers.add(tracker);
+
+        tracker.start();
     }
     //end region Actions du Manager
 
