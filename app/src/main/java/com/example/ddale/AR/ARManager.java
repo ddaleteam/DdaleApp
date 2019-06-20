@@ -53,9 +53,6 @@ class ARManager
     private RectangleRenderer rectangleRenderer;
     private Context contexte;
     private String CAT = "ARManager";
-    private int[] idCalques;
-    private int nbCalques;
-    private int indexCalqueActif = 0;
 
     /**
      * Constructeur de ARManager
@@ -65,13 +62,6 @@ class ARManager
     {
         trackers = new ArrayList<>();
         this.contexte = contexte;
-        idCalques = new int[] {
-                R.drawable.fresk2048,
-                R.drawable.fresk4096,
-                R.drawable.fromage,
-                R.drawable.medusecalque,
-        };
-        nbCalques = idCalques.length -1;
     }
 
     //demarrer region chargerCibles
@@ -235,7 +225,7 @@ class ARManager
         cameraRenderer = new Renderer();
 
         rectangleRenderer = new RectangleRenderer();
-        rectangleRenderer.init(chargerBitmap(contexte.getResources(),idCalques[indexCalqueActif]));
+        rectangleRenderer.init(chargerBitmap(contexte.getResources(),R.drawable.fromage));
     }
 
     /**
