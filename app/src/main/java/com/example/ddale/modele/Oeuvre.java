@@ -40,20 +40,17 @@ public class Oeuvre {
      * <b>annee</b> represente la annee de creation de l'oeuvre
      */
     @SerializedName("annee")
-    private String annee;
+    private int annee;
     /**
      * <b>hauteur</b> represente la hauteur de l'oeuvre (pour un tableau)
      */
     @SerializedName("hauteur")
-    private String hauteur;
-
+    private int hauteur;
     /**
      * <b>largeur</b> represente la largeur de l'oeuvre (pour un tableau)
      */
     @SerializedName("largeur")
-    private String largeur;
-
-
+    private int largeur;
     /**
      * <b>technique</b> represente la technique utilisee pour creer l'oeuvre
      */
@@ -63,7 +60,7 @@ public class Oeuvre {
      * <b>urlCible</b> represente l'URL de l'image de l'oeuvre a reconnaitre
      */
     @SerializedName("urlCible")
-    private String urlCible;
+    private String urlImageCible;
     /**
      * <b>calques</b> represente la liste des calques associees a l'oeuvre
      */
@@ -72,61 +69,34 @@ public class Oeuvre {
     /**
      * <b>audio</b> contient une URL dirigeant vers le fichier audio associe a l'oeuvre
      */
-    @SerializedName("audio")
-    private String audio;
-    /**
-     * <b>composition</b> contient une URL dirigeant vers les fichiers images associes a l'oeuvre
-     * Ces images sont superposees a l'oeuvre lors de l'affichage (realite augmentee)
-     */
-    @SerializedName("composition")
-    private String composition;
-
-    /**
-     * Constructeur par defaut
-     * La liste des calques est vide, la position de l'oeuvre est 0, tous les autres champs sont
-     *      des chaines vides
-     */
-    public Oeuvre() {
-        position = 0;
-        titre = "";
-        auteur = "";
-        annee = "";
-        largeur = "";
-        hauteur = "";
-        technique = "";
-        urlCible = "";
-        calques = new ArrayList<>();
-        audio = "";
-        composition = "";
-    }
-
+    @SerializedName("urlAudio")
+    private String urlAudio;
 
     /**
      * Constructeur par parametres d'une oeuvre
      * @param position sa position
      * @param titre son titre
      * @param auteur son auteur
-     * @param date sa annee de creation
+     * @param annee son annee de creation
      * @param hauteur la hauteur
      * @param largeur la largeur
      * @param technique la technique utilisee
      * @param urlImageCible l'URL de l'image de l'oeuvre cible
-     * @param audio le lien vers le fichier audio
-     * @param composition le lien vers les fichiers images
+     * @param urlAudio le lien vers le fichier audio
      * La liste des calques est vide
      */
-    public Oeuvre(int position, String titre, String auteur, String date, String hauteur, String largeur, String technique, String urlImageCible, String audio, String composition) {
+    public Oeuvre(int id, int position, String titre, String auteur, int annee, int hauteur, int largeur, String technique, String urlImageCible, String urlAudio) {
+        this.id = id;
         this.position = position;
         this.titre = titre;
         this.auteur = auteur;
-        this.annee = date;
+        this.annee = annee;
         this.hauteur = hauteur;
         this.largeur = largeur;
         this.technique = technique;
-        this.urlCible = urlImageCible;
-        this.audio = audio;
-        this.composition = composition;
-        calques = new ArrayList<>();
+        this.urlImageCible = urlImageCible;
+        this.urlAudio = urlAudio;
+        this.calques = new ArrayList<>();
     }
 
     /**
@@ -134,29 +104,33 @@ public class Oeuvre {
      * @param position sa position
      * @param titre son titre
      * @param auteur son auteur
-     * @param date sa annee de creation
+     * @param annee sa annee de creation
      * @param hauteur la hauteur
      * @param largeur la largeur
      * @param technique la technique utilisee
      * @param urlImageCible l'URL de l'image de l'oeuvre cible
      * @param calques la liste des calques
-     * @param audio le lien vers le fichier audio
-     * @param composition le lien vers les fichiers images
+     * @param urlAudio le lien vers le fichier audio
      */
-    public Oeuvre(int position, String titre, String auteur, String date, String hauteur, String largeur, String technique, String urlImageCible, List<Calque> calques, String audio, String composition) {
+    public Oeuvre(int id, int position, String titre, String auteur, int annee, int hauteur, int largeur, String technique, String urlImageCible, List<Calque> calques, String urlAudio) {
+        this.id = id;
         this.position = position;
         this.titre = titre;
         this.auteur = auteur;
-        this.annee = date;
+        this.annee = annee;
         this.hauteur = hauteur;
         this.largeur = largeur;
         this.technique = technique;
-        this.urlCible = urlImageCible;
+        this.urlImageCible = urlImageCible;
         this.calques = calques;
-        this.audio = audio;
-        this.composition = composition;
+        this.urlAudio = urlAudio;
     }
-    public Oeuvre( Oeuvre oeuvre){
+
+    /** Constructeur par copie d'une oeuvre
+     * @param oeuvre l'oeuvre a copier
+     */
+    public Oeuvre(Oeuvre oeuvre){
+        this.id = oeuvre.id;
         this.position = oeuvre.position;
         this.titre = oeuvre.titre;
         this.auteur = oeuvre.auteur;
@@ -164,10 +138,9 @@ public class Oeuvre {
         this.hauteur = oeuvre.hauteur;
         this.largeur = oeuvre.largeur;
         this.technique = oeuvre.technique;
-        this.urlCible = oeuvre.urlCible;
+        this.urlImageCible = oeuvre.urlImageCible;
         this.calques = oeuvre.calques;
-        this.audio = oeuvre.audio;
-        this.composition = oeuvre.composition;
+        this.urlAudio = oeuvre.urlAudio;
     }
 
     /**
@@ -187,27 +160,11 @@ public class Oeuvre {
     }
 
     /**
-     * Mutateur de la position de l'oeuvre
-     * @param position la nouvelle position a attribuer
-     */
-    public void setPosition(int position) {
-        this.position = position;
-    }
-
-    /**
      * Accesseur du titre
      * @return le titre de l'oeuvre
      */
     public String getTitre() {
         return titre;
-    }
-
-    /**
-     * Mutateur du titre
-     * @param titre le nouveau titre a attribuer
-     */
-    public void setTitre(String titre) {
-        this.titre = titre;
     }
 
     /**
@@ -219,59 +176,27 @@ public class Oeuvre {
     }
 
     /**
-     * Mutateur de l'auteur
-     * @param auteur le nouvel auteur a attribuer
-     */
-    public void setAuteur(String auteur) {
-        this.auteur = auteur;
-    }
-
-    /**
      * Accesseur de la annee
      * @return la annee de creation de l'oeuvre
      */
-    public String getAnnee() {
+    public int getAnnee() {
         return annee;
-    }
-
-    /**
-     * Mutateur de la annee
-     * @param annee la nouvelle annee de creation a attribuer
-     */
-    public void setAnnee(String annee) {
-        this.annee = annee;
     }
 
     /**
      * Accesseur da la hauteur
      * @return la hauteur de l'oeuvre
      */
-    public String getHauteur() {
+    public int getHauteur() {
         return hauteur;
-    }
-
-    /**
-     * Mutateur de la hauteur
-     * @param hauteur la nouvelle hauteur à attribuer
-     */
-    public void setHauteur(String hauteur) {
-        this.hauteur = hauteur;
     }
 
     /**
      * Accesseur de la hauteur
      * @return la hauteur de l'oeuvre
      */
-    public String getLargeur() {
+    public int getLargeur() {
         return largeur;
-    }
-
-    /**
-     * Mutateur de la largeur
-     * @param largeur la nouvelle largeur à attribuer
-     */
-    public void setLargeur(String largeur) {
-        this.largeur = largeur;
     }
 
     /**
@@ -283,27 +208,11 @@ public class Oeuvre {
     }
 
     /**
-     * Mutateur de la technique
-     * @param technique la nouvelle technique a attribuer
-     */
-    public void setTechnique(String technique) {
-        this.technique = technique;
-    }
-
-    /**
      * Accesseur de l'URL
      * @return l'URL de l'image de l'oeuvre cible
      */
-    public String getUrlCible() {
-        return urlCible;
-    }
-
-    /**
-     * Mutateur de l'URL de l'image de l'ouvre cible
-     * @param urlCible la nouvelle URL a attribuer
-     */
-    public void setUrlCible(String urlCible) {
-        this.urlCible = urlCible;
+    public String getUrlImageCible() {
+        return urlImageCible;
     }
 
     /**
@@ -315,43 +224,11 @@ public class Oeuvre {
     }
 
     /**
-     * Mutateur de la liste des calques
-     * @param calques la nouvelle liste a attribuer
-     */
-    public void setCalques(List<Calque> calques) {
-        this.calques = calques;
-    }
-
-    /**
      * Accesseur de l'URL du fichier audio
      * @return l'URL du fichier audio associe a l'oeuvre
      */
-    public String getAudio() {
-        return audio;
-    }
-
-    /**
-     * Mutateur de l'URL du fichier audio
-     * @param audio la nouvelle URL a attribuer
-     */
-    public void setAudio(String audio) {
-        this.audio = audio;
-    }
-
-    /**
-     * Accesseur de l'URL des fichiers images
-     * @return l'URL des fichiers images associes a l'oeuvre
-     */
-    public String getComposition() {
-        return composition;
-    }
-
-    /**
-     * Mutateur de l'URL des fichiers images
-     * @param composition la nouvelle URL a attribuer
-     */
-    public void setComposition(String composition) {
-        this.composition = composition;
+    public String getUrlAudio() {
+        return urlAudio;
     }
 
     /**
@@ -369,7 +246,7 @@ public class Oeuvre {
                 ", \"hauteur\": \"" + hauteur + '\"' +
                 ", \"largeur\": \"" + largeur + '\"' +
                 ", \"technique\": \"" + technique + '\"' +
-                ", \"urlCible\": \"" + urlCible + '\"' +
+                ", \"urlImageCible\": \"" + urlImageCible + '\"' +
                 ", \"calques\": [";
         Iterator<Calque> iterator = calques.iterator();
         while (iterator.hasNext()) {
@@ -381,8 +258,7 @@ public class Oeuvre {
             res += afficheAnecdote;
         }
         res = res.substring(0, (res.length() - 2)) + "]";
-        res += ", \"audio\": \"" + audio + '\"' +
-                ", \"composition\": \"" + composition + '\"' +
+        res += ", \"urlAudio\": \"" + urlAudio + '\"' +
                 "}}";
         return res;
     }
