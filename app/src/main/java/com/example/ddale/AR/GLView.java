@@ -177,28 +177,20 @@ public class GLView extends GLSurfaceView
     GLView et ArManager ont des threads différents, on utilise donc la méthode queueEvent pour
     appeler une fonction de ARManager
      */
-    public void  suivant() {
-        queueEvent(new Runnable() {
-            // This method will be called on the rendering thread:
-            public void run() {
-                ARManager.calqueSuivant();
-                }});
-    }
-
-    public void  precedent() {
-        queueEvent(new Runnable() {
-            // This method will be called on the rendering thread:
-            public void run() {
-                ARManager.calquePrecedent();
-            }});
-    }
-
-    public void notifier() {
+    public void notifier(final String cheminCible) {
         queueEvent( new Runnable() {
         // This method will be called on the rendering thread:
         public void run() {
-            ARManager.notifier();
+            ARManager.notifier(cheminCible);
         }});
+    }
+
+    public void changerCalque(final String cheminCalque) {
+        queueEvent( new Runnable() {
+            // This method will be called on the rendering thread:
+            public void run() {
+                ARManager.changerCalque(cheminCalque);
+            }});
     }
 
 }

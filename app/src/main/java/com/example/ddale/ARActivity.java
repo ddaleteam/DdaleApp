@@ -37,13 +37,15 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
     private TextView description;
     private Oeuvre oeuvre;
     private int idOeuvre;
+    private int indexCalqueActif;
+    private int nbCalques;
 
     //Start of region Cycle de Vie
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        idOeuvre = getIntent().getIntExtra("idOeuvre", 1);
+        idOeuvre = getIntent().getIntExtra("idOeuvre", 2);
         Log.i(CAT, "onCreate: " + idOeuvre);
 
 
@@ -184,8 +186,12 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
                     builder.setMessage("Titre de l'oeuvre : " +oeuvre.getTitre()+"\nEt l'incroyable auteur : " +oeuvre.getAuteur());
                     AlertDialog alert1 = builder.create();
                     alert1.show();
-
-                    glView.notifier();
+                    Log.i(CAT, "onResponse: " + oeuvre.getCalques());
+                    indexCalqueActif = 0;
+                    nbCalques = oeuvre.getCalques().size() -1;
+                    glView.notifier("https://ddale.rezoleo.fr/" + oeuvre.getUrlCible());
+                    glView.changerCalque("https://ddale.rezoleo.fr/"
+                            + oeuvre.getCalques().get(indexCalqueActif).getUrlCalque());
 
                 } else {
                     Log.i(CAT,"Erreur lors de l'appel à l'API pour récupérer l'oeuvre");
@@ -212,12 +218,16 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
                     description.setVisibility(View.INVISIBLE);
                 break;
             case R.id.btnPrecedent:
-                description.setText("description précédente");
-                glView.precedent();
+                indexCalqueActif = (indexCalqueActif == 0) ? nbCalques : indexCalqueActif -1;
+                description.setText(oeuvre.getCalques().get(indexCalqueActif).getDescription());
+                glView.changerCalque("https://ddale.rezoleo.fr/"
+                        + oeuvre.getCalques().get(indexCalqueActif).getUrlCalque());
                 break;
             case R.id.btnSuivant:
-                description.setText("description suivante");
-                glView.suivant();
+                indexCalqueActif = (indexCalqueActif == nbCalques) ? 0 : indexCalqueActif +1;
+                description.setText(oeuvre.getCalques().get(indexCalqueActif).getDescription());
+                glView.changerCalque("https://ddale.rezoleo.fr/"
+                        + oeuvre.getCalques().get(indexCalqueActif).getUrlCalque());
                 break;
             default:
                 description.setVisibility(View.INVISIBLE);

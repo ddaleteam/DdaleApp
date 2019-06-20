@@ -15,7 +15,11 @@ import android.opengl.GLES20;
 import android.util.Log;
 
 import com.example.ddale.R;
+import com.squareup.picasso.Picasso;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import cn.easyar.CameraCalibration;
@@ -83,7 +87,30 @@ class ARManager
             + "    }\n"
             + "  ]\n"
             + "}";
+        //cible.setup(jstr, StorageType.Absolute | StorageType.Json, "");
         cible.setup(jstr, StorageType.Assets | StorageType.Json, "");
+        tracker.loadTarget(cible, new FunctorOfVoidFromPointerOfTargetAndBool() {
+            @Override
+            public void invoke(Target cible, boolean status) {
+                Log.i(CAT, String.format("load cible (%b): %s (%d)",
+                        status, cible.name(), cible.runtimeID()));
+            }
+        });
+    }
+
+    private void chargerDepuisImageLocale(ImageTracker tracker, String path)
+    {
+        ImageTarget cible = new ImageTarget();
+        String jstr = "{\n"
+                + "  \"images\" :\n"
+                + "  [\n"
+                + "    {\n"
+                + "      \"image\" : \"" + path + "\",\n"
+                + "      \"name\" : \"" + path.substring(0, path.indexOf(".")) + "\"\n"
+                + "    }\n"
+                + "  ]\n"
+                + "}";
+        cible.setup(jstr, StorageType.Absolute | StorageType.Json, "");
         tracker.loadTarget(cible, new FunctorOfVoidFromPointerOfTargetAndBool() {
             @Override
             public void invoke(Target cible, boolean status) {
@@ -306,31 +333,35 @@ class ARManager
         }
     }
 
-    /**
-     * Passage au calque suivant (à adapter selon les besoins)
-     */
-    void calqueSuivant() {
-        indexCalqueActif = (indexCalqueActif == nbCalques) ? 0 : indexCalqueActif +1;
-        Bitmap nouveauCalque = chargerBitmap(contexte.getResources(), idCalques[indexCalqueActif]);
-        rectangleRenderer.changerCalque(nouveauCalque);
+
+    void changerCalque(String cheminImage) {
+        Log.i(CAT, "changerCalque: " + cheminImage);
+        Bitmap imageCalque;
+        try {
+            imageCalque = Picasso.get().load(cheminImage).get();
+            rectangleRenderer.changerCalque(imageCalque);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    /**
-     * Passage au calque précédent (à adapter selon les besoins)
-     */
-    void calquePrecedent() {
-        indexCalqueActif = (indexCalqueActif == 0) ? nbCalques : indexCalqueActif -1;
-        Bitmap nouveauCalque = chargerBitmap(contexte.getResources(), idCalques[indexCalqueActif]);
-        rectangleRenderer.changerCalque(nouveauCalque);
-    }
-
-    void notifier() {
-        Log.i(CAT, "notifier: ");
+    void notifier(String cheminCible) {
+        Log.i(CAT, "notifier");
+        Log.i(CAT, "notifier: " + cheminCible);
 
         ImageTracker tracker = new ImageTracker();
         tracker.attachStreamer(streamer);
 
-        chargerDepuisImage(tracker, "smallmeduse.jpeg");
+        Bitmap bitmap = null;
+        try {
+            bitmap = Picasso.get().load(cheminCible).get();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String path = saveToInternalStorage(bitmap,cheminCible.substring(cheminCible.lastIndexOf("/")+1));
+        Log.i("ALLER", "notifier: " + path);
+
+        chargerDepuisImageLocale(tracker, path);
 
         trackers.add(tracker);
 
@@ -352,4 +383,26 @@ class ARManager
     }
 
 
+    private String saveToInternalStorage (Bitmap bitmapImage, String ImgName) {
+        // path to /data/data/yourapp/app_data/imageDir
+        File directory = contexte.getCacheDir();
+        // Create imageDir
+        File mypath=new File(directory,ImgName);
+
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(mypath);
+            // Use the compress method on the BitMap object to write image to the OutputStream
+            bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                fos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return directory.getAbsolutePath() + "/" + ImgName;
+    }
 }
