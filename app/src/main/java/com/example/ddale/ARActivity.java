@@ -183,13 +183,16 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
                     ARActivity.this.oeuvre = new Oeuvre(response.body());
                     AlertDialog.Builder builder = new AlertDialog.Builder(ARActivity.this);
                     builder.setTitle("Scan Result");
-                    builder.setMessage("Titre de l'oeuvre : " +oeuvre.getTitre()+"\nEt l'incroyable auteur : " +oeuvre.getAuteur());
+                    builder.setMessage("Titre de l'oeuvre : " +oeuvre.getTitre()+"\nPar " +oeuvre.getAuteur());
                     AlertDialog alert1 = builder.create();
                     alert1.show();
                     Log.i(CAT, "onResponse: " + oeuvre.getCalques());
                     indexCalqueActif = 0;
                     nbCalques = oeuvre.getCalques().size() -1;
-                    glView.notifier("https://ddale.rezoleo.fr/" + oeuvre.getUrlCible());
+                    glView.notifier("https://ddale.rezoleo.fr/" + oeuvre.getUrlImageCible());
+                    String descriptionOeuvre = oeuvre.getTitre() + ", " + oeuvre.getAnnee() +"\n" + oeuvre.getTechnique()
+                            +  "\n" +  oeuvre.getAuteur() + "\n" + oeuvre.getHauteur() + " cm × " + oeuvre.getLargeur() + " cm";
+                    description.setText(descriptionOeuvre);
                     glView.changerCalque("https://ddale.rezoleo.fr/"
                             + oeuvre.getCalques().get(indexCalqueActif).getUrlCalque());
 
