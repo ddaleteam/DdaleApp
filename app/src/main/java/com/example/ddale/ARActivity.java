@@ -3,7 +3,10 @@ package com.example.ddale;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -21,6 +25,9 @@ import com.example.ddale.API.APIClient;
 import com.example.ddale.API.APIInterface;
 import com.example.ddale.AR.GLView;
 import com.example.ddale.modele.Oeuvre;
+
+import java.io.File;
+import java.io.IOException;
 
 import cn.easyar.Engine;
 import retrofit2.Call;
@@ -39,6 +46,8 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
     private int idOeuvre;
     private int indexCalqueActif;
     private int nbCalques;
+    private ImageButton btnImgAudio;
+    private MediaPlayer audio;
 
     //Start of region Cycle de Vie
     @Override
@@ -77,6 +86,8 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
         Button btnSuivant = findViewById(R.id.btnSuivant);
         Button btnPrecedent = findViewById(R.id.btnPrecedent);
         Button btnInfo = findViewById(R.id.btnInfo);
+        btnImgAudio = findViewById(R.id.imgBtnAudio);
+        btnImgAudio.setOnClickListener(this);
         btnSuivant.setOnClickListener(this);
         btnPrecedent.setOnClickListener(this);
         btnInfo.setOnClickListener(this);
@@ -131,6 +142,7 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
     //Start of region fonctions utilitaires
     private SparseArray<PermissionCallback> permissionCallbacks = new SparseArray<>();
     private int permissionRequestCodeSerial = 0;
+
 
     @TargetApi(23)
     private void requestCameraPermission(PermissionCallback callback) {
@@ -195,6 +207,12 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
                     description.setText(descriptionOeuvre);
                     glView.changerCalque("https://ddale.rezoleo.fr/"
                             + oeuvre.getCalques().get(indexCalqueActif).getUrlCalque());
+                    if(!oeuvre.getUrlAudio().isEmpty()){
+                        Uri chemin = creerTempFile(ARActivity.this,oeuvre.getUrlAudio());
+                        Log.i(CAT, "onResponse: " + chemin);
+                        audio = MediaPlayer.create(ARActivity.this,chemin);
+                        btnImgAudio.setVisibility(View.VISIBLE);
+                    }
 
                 } else {
                     Log.i(CAT,"Erreur lors de l'appel à l'API pour récupérer l'oeuvre");
@@ -215,10 +233,10 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.btnInfo:
-                if(description.getVisibility() == View.INVISIBLE)
+                if(description.getVisibility() == View.GONE)
                     description.setVisibility(View.VISIBLE);
                 else
-                    description.setVisibility(View.INVISIBLE);
+                    description.setVisibility(View.GONE);
                 break;
             case R.id.btnPrecedent:
                 indexCalqueActif = (indexCalqueActif == 0) ? nbCalques : indexCalqueActif -1;
@@ -232,13 +250,37 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
                 glView.changerCalque("https://ddale.rezoleo.fr/"
                         + oeuvre.getCalques().get(indexCalqueActif).getUrlCalque());
                 break;
+
+            case R.id.imgBtnAudio:
+                if (audio.isPlaying()) {
+                    btnImgAudio.setImageResource(android.R.drawable.ic_media_pause);
+                    audio.pause();
+                }
+                else{
+                    btnImgAudio.setImageResource(android.R.drawable.ic_media_play);
+                    audio.start();
+                }
+
             default:
-                description.setVisibility(View.INVISIBLE);
+                description.setVisibility(View.GONE);
                 break;
         }
 
     }
     //Fin region onClick
+
+    private Uri creerTempFile(Context context, String url) {
+        File file;
+        try {
+            String fileName = Uri.parse(url).getLastPathSegment();
+            file = File.createTempFile(fileName, "mp3",
+                    context.getCacheDir());
+            return Uri.parse(file.getAbsolutePath());
+        } catch (IOException e) {
+            // Error while creating file
+        }
+        return null;
+    }
 
 
 }
