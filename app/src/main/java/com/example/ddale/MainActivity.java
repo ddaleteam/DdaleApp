@@ -27,15 +27,15 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
-        /*
+
         Button btnDebugAR = findViewById(R.id.btnDebugAR);
         btnDebugAR.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent arIntent = new Intent(MainActivity.this, ARActivity.class);
+                Intent arIntent = new Intent(MainActivity.this, MapActivity.class);
                 startActivity(arIntent);
             }
         });
-        */
+
     }
 }

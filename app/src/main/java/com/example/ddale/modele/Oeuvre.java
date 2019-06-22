@@ -2,6 +2,8 @@ package com.example.ddale.modele;
 
 import com.google.gson.annotations.SerializedName;
 
+import org.osmdroid.util.GeoPoint;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -21,11 +23,7 @@ public class Oeuvre {
      */
     @SerializedName("id")
     private int id;
-    /**
-     * <b>position</b> represente la position de l'oeuvre dans le musee
-     */
-    @SerializedName("position")
-    private int position;
+
     /**
      * <b>titre</b> represente le titre de l'oeuvre
      */
@@ -71,23 +69,31 @@ public class Oeuvre {
      */
     @SerializedName("urlAudio")
     private String urlAudio;
+    /**
+     * <b>localisation</b> contient l'emplacement de l'oeuvre.
+     */
+    //@SerializedName("")
+    private GeoPoint localisation;
 
     /**
      * Constructeur par parametres d'une oeuvre
-     * @param position sa position
-     * @param titre son titre
-     * @param auteur son auteur
-     * @param annee son annee de creation
-     * @param hauteur la hauteur
-     * @param largeur la largeur
-     * @param technique la technique utilisee
+     *
+     * @param longitude     de l'oeuvre
+     * @param latitude      de l'oeuvre
+     * @param altitude      de l'oeuvre
+     * @param titre         son titre
+     * @param auteur        son auteur
+     * @param annee         son annee de creation
+     * @param hauteur       la hauteur
+     * @param largeur       la largeur
+     * @param technique     la technique utilisee
      * @param urlImageCible l'URL de l'image de l'oeuvre cible
-     * @param urlAudio le lien vers le fichier audio
-     * La liste des calques est vide
+     * @param urlAudio      le lien vers le fichier audio
+     *                      La liste des calques est vide
      */
-    public Oeuvre(int id, int position, String titre, String auteur, int annee, int hauteur, int largeur, String technique, String urlImageCible, String urlAudio) {
+    public Oeuvre(int id, double longitude, double latitude, double altitude, String titre, String auteur, int annee, int hauteur, int largeur, String technique, String urlImageCible, String urlAudio) {
         this.id = id;
-        this.position = position;
+        this.localisation = new GeoPoint(latitude, longitude, altitude);
         this.titre = titre;
         this.auteur = auteur;
         this.annee = annee;
@@ -101,20 +107,23 @@ public class Oeuvre {
 
     /**
      * Constructeur par parametres d'une oeuvre
-     * @param position sa position
-     * @param titre son titre
-     * @param auteur son auteur
-     * @param annee sa annee de creation
-     * @param hauteur la hauteur
-     * @param largeur la largeur
-     * @param technique la technique utilisee
+     *
+     * @param longitude     de l'oeuvre
+     * @param latitude      de l'oeuvre
+     * @param altitude      de l'oeuvre
+     * @param titre         son titre
+     * @param auteur        son auteur
+     * @param annee         sa annee de creation
+     * @param hauteur       la hauteur
+     * @param largeur       la largeur
+     * @param technique     la technique utilisee
      * @param urlImageCible l'URL de l'image de l'oeuvre cible
-     * @param calques la liste des calques
-     * @param urlAudio le lien vers le fichier audio
+     * @param calques       la liste des calques
+     * @param urlAudio      le lien vers le fichier audio
      */
-    public Oeuvre(int id, int position, String titre, String auteur, int annee, int hauteur, int largeur, String technique, String urlImageCible, List<Calque> calques, String urlAudio) {
+    public Oeuvre(int id, int position, double longitude, double latitude, double altitude, String titre, String auteur, int annee, int hauteur, int largeur, String technique, String urlImageCible, List<Calque> calques, String urlAudio) {
         this.id = id;
-        this.position = position;
+        this.localisation = new GeoPoint(latitude, longitude, altitude);
         this.titre = titre;
         this.auteur = auteur;
         this.annee = annee;
@@ -126,12 +135,14 @@ public class Oeuvre {
         this.urlAudio = urlAudio;
     }
 
-    /** Constructeur par copie d'une oeuvre
+    /**
+     * Constructeur par copie d'une oeuvre
+     *
      * @param oeuvre l'oeuvre a copier
      */
-    public Oeuvre(Oeuvre oeuvre){
+    public Oeuvre(Oeuvre oeuvre) {
         this.id = oeuvre.id;
-        this.position = oeuvre.position;
+        this.localisation = oeuvre.localisation;
         this.titre = oeuvre.titre;
         this.auteur = oeuvre.auteur;
         this.annee = oeuvre.annee;
@@ -145,6 +156,7 @@ public class Oeuvre {
 
     /**
      * Accesseur de l'identifiant
+     *
      * @return l'identifiant de l'oeuvre
      */
     public int getId() {
@@ -152,15 +164,17 @@ public class Oeuvre {
     }
 
     /**
-     * Accesseur de la position
-     * @return la position de l'oeuvre
+     * Accesseur de la localisation
+     *
+     * @return la localisation de l'oeuvre
      */
-    public int getPosition() {
-        return position;
+    public GeoPoint getLocalisation() {
+        return localisation;
     }
 
     /**
      * Accesseur du titre
+     *
      * @return le titre de l'oeuvre
      */
     public String getTitre() {
@@ -169,6 +183,7 @@ public class Oeuvre {
 
     /**
      * Accesseur de l'auteur
+     *
      * @return l'auteur de l'oeuvre
      */
     public String getAuteur() {
@@ -177,6 +192,7 @@ public class Oeuvre {
 
     /**
      * Accesseur de la annee
+     *
      * @return la annee de creation de l'oeuvre
      */
     public int getAnnee() {
@@ -185,6 +201,7 @@ public class Oeuvre {
 
     /**
      * Accesseur da la hauteur
+     *
      * @return la hauteur de l'oeuvre
      */
     public int getHauteur() {
@@ -193,6 +210,7 @@ public class Oeuvre {
 
     /**
      * Accesseur de la hauteur
+     *
      * @return la hauteur de l'oeuvre
      */
     public int getLargeur() {
@@ -201,6 +219,7 @@ public class Oeuvre {
 
     /**
      * Accesseur de la technique
+     *
      * @return la technique utilisee pour creer l'oeuvre
      */
     public String getTechnique() {
@@ -209,6 +228,7 @@ public class Oeuvre {
 
     /**
      * Accesseur de l'URL
+     *
      * @return l'URL de l'image de l'oeuvre cible
      */
     public String getUrlImageCible() {
@@ -217,6 +237,7 @@ public class Oeuvre {
 
     /**
      * Accesseur de la liste des calques
+     *
      * @return la liste des calques associees a l'oeuvre
      */
     public List<Calque> getCalques() {
@@ -225,6 +246,7 @@ public class Oeuvre {
 
     /**
      * Accesseur de l'URL du fichier audio
+     *
      * @return l'URL du fichier audio associe a l'oeuvre
      */
     public String getUrlAudio() {
@@ -233,13 +255,14 @@ public class Oeuvre {
 
     /**
      * Affichage d'une oeuvre
+     *
      * @return une chaine de caractere au format JSON representant une oeuvre
      */
     @Override
     public String toString() {
         String res = "{\"oeuvre\": {" +
                 "\"id\": " + id +
-                ", \"position\": \"" + position + '\"' +
+                ", \"localisation\": \"" + localisation.toString()  + '\"' +
                 ", \"titre\": \"" + titre + '\"' +
                 ", \"auteur\": \"" + auteur + '\"' +
                 ", \"annee\": \"" + annee + '\"' +
