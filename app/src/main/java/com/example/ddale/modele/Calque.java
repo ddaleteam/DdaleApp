@@ -54,7 +54,8 @@ public class Calque {
      * @param urlAudio l'url du fichier audio associe au calque
      * @param oeuvre_id l'identifiant de l'oeuvre associee au calque
      */
-    public Calque(int id, String description, String urlCalque, String typeCalque, String urlAudio, int oeuvre_id) {
+    public Calque(int id, String description, String urlCalque, String typeCalque, String urlAudio,
+                  int oeuvre_id) {
         this.id = id;
         this.description = description;
         this.urlCalque = urlCalque;
