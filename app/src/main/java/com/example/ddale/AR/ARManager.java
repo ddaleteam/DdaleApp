@@ -225,7 +225,7 @@ class ARManager
         cameraRenderer = new Renderer();
 
         rectangleRenderer = new RectangleRenderer();
-        rectangleRenderer.init(chargerBitmap(contexte.getResources(),R.drawable.fromage));
+        rectangleRenderer.init(chargerBitmap(contexte.getResources(),R.drawable.vide));
     }
 
     /**
@@ -394,5 +394,11 @@ class ARManager
             }
         }
         return directory.getAbsolutePath() + "/" + ImgName;
+    }
+
+    public void afficherVide() {
+        Bitmap image = chargerBitmap(contexte.getResources(),R.drawable.vide);
+        rectangleRenderer.changerCalque(image);
+
     }
 }

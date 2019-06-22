@@ -51,6 +51,7 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
     private MediaPlayer audio;
     private DownloadManager downloadManager;
     private Uri chemin;
+    private BroadcastReceiver onComplete;
 
     //Start of region Cycle de Vie
     @Override
@@ -85,7 +86,7 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
         }
 
         downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-        BroadcastReceiver onComplete= new BroadcastReceiver() {
+        onComplete= new BroadcastReceiver() {
             public void onReceive(Context ctxt, Intent intent) {
                 audio = MediaPlayer.create(ARActivity.this, chemin);
                 btnImgAudio.setVisibility(View.VISIBLE);
@@ -143,6 +144,7 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        unregisterReceiver(onComplete);
         if (audio != null) {
             audio.release();
             audio = null;
@@ -224,8 +226,7 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
                     String descriptionOeuvre = oeuvre.getTitre() + ", " + oeuvre.getAnnee() +"\n" + oeuvre.getTechnique()
                             +  "\n" +  oeuvre.getAuteur() + "\n" + oeuvre.getHauteur() + " cm × " + oeuvre.getLargeur() + " cm";
                     description.setText(descriptionOeuvre);
-                    glView.changerCalque("https://ddale.rezoleo.fr/"
-                            + oeuvre.getCalques().get(indexCalqueActif).getUrlCalque());
+                    glView.afficherVide();
                     if(!oeuvre.getUrlAudio().isEmpty()){
                         chemin = telechargeAudio("https://ddale.rezoleo.fr/" + oeuvre.getUrlAudio());
                         Log.i(CAT, "onResponse: " + chemin);
@@ -291,7 +292,7 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
                     + " cm × " + oeuvre.getLargeur() + " cm";
             description.setText(descriptionOeuvre);
 
-            glView.changerCalque("https://ddale.rezoleo.fr/calques/vide.png" );
+            glView.afficherVide();
 
             if(!oeuvre.getUrlAudio().isEmpty()){
                 chemin = telechargeAudio("https://ddale.rezoleo.fr/" + oeuvre.getUrlAudio());
