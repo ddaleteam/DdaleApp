@@ -38,30 +38,29 @@ public class Calque {
      */
     @SerializedName("urlAudio")
     private String urlAudio;
-  
     /**
-     * Constructeur par defaut
-     * Toutes les chaines sont vides
+     * <b>oeuvre_id</b> represente l'identifiant de l'oeuvre associee au calque
      */
-    public Calque() {
-        urlCalque = "";
-        description = "";
-        urlAudio = "";
-        typeCalque = "";
-    }
+    @SerializedName("oeuvre_id")
+    private int oeuvre_id;
+
 
     /**
      * Constructeur par parametres
+     * @param id l'identifiant du calque
      * @param description la description associee a l'anecdote
      * @param urlCalque l'url du calque
      * @param typeCalque le type du calque
      * @param urlAudio l'url du fichier audio associe au calque
+     * @param oeuvre_id l'identifiant de l'oeuvre associee au calque
      */
-    public Calque(String description, String urlCalque, String typeCalque, String urlAudio) {
+    public Calque(int id, String description, String urlCalque, String typeCalque, String urlAudio, int oeuvre_id) {
+        this.id = id;
         this.description = description;
         this.urlCalque = urlCalque;
         this.typeCalque = typeCalque;
         this.urlAudio = urlAudio;
+        this.oeuvre_id = oeuvre_id;
     }
 
     /**
@@ -81,27 +80,11 @@ public class Calque {
     }
 
     /**
-     * Mutateur de l'URL du calque
-     * @param urlCalque la nouvelle URL
-     */
-    public void setUrlCalque(String urlCalque) {
-        this.urlCalque = urlCalque;
-    }
-
-    /**
      * Accesseur du typeCalque
      * @return le typeCalque du calque
      */
     public String getTypeCalque() {
         return typeCalque;
-    }
-
-    /**
-     * Mutateur du typeCalque du calque
-     * @param typeCalque le nouveau typeCalque
-     */
-    public void setTypeCalque(String typeCalque) {
-        this.typeCalque = typeCalque;
     }
 
     /**
@@ -113,14 +96,6 @@ public class Calque {
     }
 
     /**
-     * Mutateur de la description associee a l'anecdote
-     * @param description la nouvelle description a associer
-     */
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    /**
      * Accesseur de l'URL du fichier audio
      * @return l'URL associee au fichier audio
      */
@@ -129,11 +104,11 @@ public class Calque {
     }
 
     /**
-     * Mutateur de l'URL du fichier audio
-     * @param urlAudio la nouvelle URL a associer
+     * Accesseur de l'identifiant de l'oeuvre associee au calque
+     * @return l'identifiant de l'oeuvre
      */
-    public void setUrlAudio(String urlAudio) {
-        this.urlAudio = urlAudio;
+    public int getOeuvre_id() {
+        return oeuvre_id;
     }
 
     /**
@@ -148,6 +123,7 @@ public class Calque {
                 ", \"urlCalque\": " + urlCalque +
                 ", \"urlAudio\": " + urlAudio +
                 ", \"description\": \"" + description + "\"" +
+                ", \"oeuvre_id\": \"" + oeuvre_id + "\"" +
                 "}}";
     }
 }
