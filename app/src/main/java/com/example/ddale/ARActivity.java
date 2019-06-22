@@ -3,7 +3,11 @@ package com.example.ddale;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -26,9 +30,6 @@ import com.example.ddale.API.APIInterface;
 import com.example.ddale.AR.GLView;
 import com.example.ddale.modele.Oeuvre;
 
-import java.io.File;
-import java.io.IOException;
-
 import cn.easyar.Engine;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -48,6 +49,8 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
     private int nbCalques;
     private ImageButton btnImgAudio;
     private MediaPlayer audio;
+    private DownloadManager downloadManager;
+    private Uri chemin;
 
     //Start of region Cycle de Vie
     @Override
@@ -81,7 +84,14 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
             Log.e(CAT, "Initialization Failed.");
         }
 
-
+        downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+        BroadcastReceiver onComplete= new BroadcastReceiver() {
+            public void onReceive(Context ctxt, Intent intent) {
+                audio = MediaPlayer.create(ARActivity.this, chemin);
+                btnImgAudio.setVisibility(View.VISIBLE);
+            }
+        };
+        registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 
         Button btnSuivant = findViewById(R.id.btnSuivant);
         Button btnPrecedent = findViewById(R.id.btnPrecedent);
@@ -128,6 +138,15 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
     protected void onPause() {
         if (glView != null) { glView.onPause(); }
         super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (audio != null) {
+            audio.release();
+            audio = null;
+        }
     }
     //end of region Cycle de Vie
 
@@ -199,7 +218,7 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
                     AlertDialog alert1 = builder.create();
                     alert1.show();
                     Log.i(CAT, "onResponse: " + oeuvre.getCalques());
-                    indexCalqueActif = 0;
+                    indexCalqueActif = -1;
                     nbCalques = oeuvre.getCalques().size() -1;
                     glView.notifier("https://ddale.rezoleo.fr/" + oeuvre.getUrlImageCible());
                     String descriptionOeuvre = oeuvre.getTitre() + ", " + oeuvre.getAnnee() +"\n" + oeuvre.getTechnique()
@@ -208,7 +227,7 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
                     glView.changerCalque("https://ddale.rezoleo.fr/"
                             + oeuvre.getCalques().get(indexCalqueActif).getUrlCalque());
                     if(!oeuvre.getUrlAudio().isEmpty()){
-                        Uri chemin = creerTempFile(ARActivity.this,oeuvre.getUrlAudio());
+                        chemin = telechargeAudio("https://ddale.rezoleo.fr/" + oeuvre.getUrlAudio());
                         Log.i(CAT, "onResponse: " + chemin);
                         audio = MediaPlayer.create(ARActivity.this,chemin);
                         btnImgAudio.setVisibility(View.VISIBLE);
@@ -239,16 +258,12 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
                     description.setVisibility(View.GONE);
                 break;
             case R.id.btnPrecedent:
-                indexCalqueActif = (indexCalqueActif == 0) ? nbCalques : indexCalqueActif -1;
-                description.setText(oeuvre.getCalques().get(indexCalqueActif).getDescription());
-                glView.changerCalque("https://ddale.rezoleo.fr/"
-                        + oeuvre.getCalques().get(indexCalqueActif).getUrlCalque());
+                indexCalqueActif = (indexCalqueActif == -1) ? nbCalques : indexCalqueActif -1;
+                changer(indexCalqueActif);
                 break;
             case R.id.btnSuivant:
-                indexCalqueActif = (indexCalqueActif == nbCalques) ? 0 : indexCalqueActif +1;
-                description.setText(oeuvre.getCalques().get(indexCalqueActif).getDescription());
-                glView.changerCalque("https://ddale.rezoleo.fr/"
-                        + oeuvre.getCalques().get(indexCalqueActif).getUrlCalque());
+                indexCalqueActif = (indexCalqueActif == nbCalques) ? -1 : indexCalqueActif +1;
+                changer(indexCalqueActif);
                 break;
 
             case R.id.imgBtnAudio:
@@ -269,18 +284,47 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
     }
     //Fin region onClick
 
-    private Uri creerTempFile(Context context, String url) {
-        File file;
-        try {
-            String fileName = Uri.parse(url).getLastPathSegment();
-            file = File.createTempFile(fileName, "mp3",
-                    context.getCacheDir());
-            return Uri.parse(file.getAbsolutePath());
-        } catch (IOException e) {
-            // Error while creating file
+    private void changer(int index){
+        if(index == -1){
+            String descriptionOeuvre = oeuvre.getTitre() + ", " + oeuvre.getAnnee() +"\n"
+                    + oeuvre.getTechnique() +  "\n" +  oeuvre.getAuteur() + "\n" + oeuvre.getHauteur()
+                    + " cm × " + oeuvre.getLargeur() + " cm";
+            description.setText(descriptionOeuvre);
+
+            glView.changerCalque("https://ddale.rezoleo.fr/calques/vide.png" );
+
+            if(!oeuvre.getUrlAudio().isEmpty()){
+                chemin = telechargeAudio("https://ddale.rezoleo.fr/" + oeuvre.getUrlAudio());
+                Log.i(CAT, "onResponse: " + chemin);
+            }
+
         }
-        return null;
+        else{
+            description.setText(oeuvre.getCalques().get(index).getDescription());
+            glView.changerCalque("https://ddale.rezoleo.fr/"
+                    + oeuvre.getCalques().get(index).getUrlCalque());
+            if(!oeuvre.getCalques().get(index).getUrlAudio().isEmpty()) {
+                if (audio != null) {
+                    audio.stop();
+                }
+                chemin = telechargeAudio( "https://ddale.rezoleo.fr/" +
+                        oeuvre.getCalques().get(index).getUrlAudio());
+                Log.i(CAT, "onResponse: " + chemin);
+            }
+            else
+                btnImgAudio.setVisibility(View.GONE);
+        }
     }
 
+    private Uri telechargeAudio(String url){
+        Log.i(CAT, "telechargeAudio: " + url);
+        Uri uriServeur = Uri.parse(url);
+        DownloadManager.Request request = new DownloadManager.Request(uriServeur);
+        Uri uriLocale = Uri.parse(getCacheDir().getAbsolutePath() + "audio/" + uriServeur.getLastPathSegment() + ".mp3");
+        Log.i(CAT, "telechargeAudio: " + uriLocale);
+        request.setDestinationUri(uriLocale);
+        downloadManager.enqueue(request);
+        return uriLocale;
 
+    }
 }
