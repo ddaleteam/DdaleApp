@@ -19,6 +19,7 @@ import com.example.ddale.modele.Parcours;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.nio.channels.NonReadableChannelException;
 import java.util.ArrayList;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
@@ -83,8 +84,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             nomParcours.setText(parcoursAffiche.getNom());
             String texteAffiche = "Durée : " + parcoursAffiche.getDuree() + " min";
             duree.setText(texteAffiche);
-            Picasso.get().load("https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/JEAN_LOUIS_TH%C3%89ODORE_G%C3%89RICAULT_-_La_Balsa_de_la_Medusa_%28Museo_del_Louvre%2C_1818-19%29.jpg/320px-JEAN_LOUIS_TH%C3%89ODORE_G%C3%89RICAULT_-_La_Balsa_de_la_Medusa_%28Museo_del_Louvre%2C_1818-19%29.jpg").into(imageView);
-
+            if (!parcoursAffiche.getOeuvres().isEmpty()){
+                Picasso.get().load("https://ddale.rezoleo.fr/" + parcoursAffiche.getOeuvres().get(0).getUrlImageCible()).into(imageView);
+            }
         }
     }
 
