@@ -8,5 +8,6 @@
     <string name="precedent">Précédent</string>
     <string name="consigneQR">This your captain speaking.
         \n\nPlease scan the QR Code next to the tableau.</string>
+    <string name="internet">Aucune connexion réseau détectée ! \n Veuillez redémarrer l\'application.</string>
 
 </resources>
