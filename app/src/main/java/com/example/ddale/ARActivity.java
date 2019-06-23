@@ -291,6 +291,7 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
                 l'affiche (changement cyclique)
             */
             case R.id.btnPrecedent:
+                audio.pause();
                 indiceCalqueActif = (indiceCalqueActif == -1) ? nbCalques : indiceCalqueActif -1;
                 changer(indiceCalqueActif);
                 btnImgAudio.setImageResource(android.R.drawable.ic_media_play);
@@ -299,6 +300,7 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
                 (changement cyclique)
             */
             case R.id.btnSuivant:
+                audio.pause();
                 indiceCalqueActif = (indiceCalqueActif == nbCalques) ? -1 : indiceCalqueActif +1;
                 changer(indiceCalqueActif);
                 btnImgAudio.setImageResource(android.R.drawable.ic_media_play);
