@@ -6,8 +6,8 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.CompoundButton;
-import android.widget.ImageView;
 import android.widget.Switch;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,6 +26,7 @@ import org.osmdroid.views.overlay.ScaleBarOverlay;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MapActivity extends AppCompatActivity {
@@ -58,22 +59,31 @@ public class MapActivity extends AppCompatActivity {
 
         setUpMyLocationOverlay();
 
+        ArrayList<Oeuvre> oeuvres = new ArrayList<>(1);
+        oeuvres.add(0,oeuvre);
+        setUpOeuvreMarkers(oeuvres);
 
-
-        Marker startMarker = new Marker(map);
-        startMarker.setRelatedObject(oeuvre);
-        startMarker.setPosition(oeuvre.getLocalisation());
-        startMarker.setInfoWindow(new DdaleInfoWindow(map, oeuvre));
-        startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-        startMarker.setIcon(getDrawable(R.drawable.ic_place_32dp));
-        ImageView imageView = new ImageView(this);//Intermédiaire pour le passage de l'image de picasso au marker
-        startMarker.setTitle(oeuvre.getTitre());
-        startMarker.setSnippet(oeuvre.getAuteur());
-        map.getOverlays().add(startMarker);
 
         IMapController mapController = map.getController();
         mapController.setZoom(20);
         ((IMapController) mapController).setCenter(new GeoPoint(oeuvre.getLocalisation().getLatitude(), oeuvre.getLocalisation().getLongitude() - 0.0001));
+    }
+
+    private void setUpOeuvreMarkers(ArrayList<Oeuvre> oeuvres) {
+        ArrayList<Marker> markers = new ArrayList<>(oeuvres.size());
+        for (Oeuvre oeuvre : oeuvres) {
+            Marker marker = new Marker(map);
+            marker.setRelatedObject(oeuvre);
+            marker.setPosition(oeuvre.getLocalisation());
+            marker.setInfoWindow(new DdaleInfoWindow(map, oeuvre));
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            marker.setIcon(getDrawable(R.drawable.ic_place_32dp));
+            marker.setTitle(oeuvre.getTitre());
+            marker.setSnippet(oeuvre.getAuteur());
+            markers.add(marker);
+        }
+        Log.i("PMR", "oeuvres lenght : " + oeuvres.size() + " /markers : " + markers.size());
+        map.getOverlays().addAll(markers);
     }
 
     private void setUpMyLocationOverlay() {
