@@ -28,16 +28,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        /*
-        Button btnDebugAR = findViewById(R.id.btnDebugAR);
-        btnDebugAR.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent arIntent = new Intent(MainActivity.this, ARActivity.class);
-                startActivity(arIntent);
-            }
-        });
-        */
 
         parcours.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -46,7 +36,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
-
 
     }
 }
