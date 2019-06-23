@@ -12,7 +12,6 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentActivity;
 
 import com.example.ddale.API.APIClient;
 import com.example.ddale.API.APIInterface;
@@ -39,10 +38,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/**
+ * Activity générant la carte pour se diriger, a priori dans un musée
+ */
 public class MapActivity extends AppCompatActivity implements DdaleInfoWindow.onARButtonClickListener {
-    MapView map = null;
+    MapView map = null; // La vue de la map
     private MyLocationNewOverlay myLocationNewOverlay;
-    private Switch switchMyLocation;
+    private Switch switchMyLocation; // permet d'activer ou de désactiver l'affichage de la position
     private List<Oeuvre> oeuvres;
     private Parcours parcours;
     private final String TAG = "PMR";
@@ -50,23 +52,32 @@ public class MapActivity extends AppCompatActivity implements DdaleInfoWindow.on
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
 
+        //nécessaire pour osmdroid :
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
+
         setContentView(R.layout.activity_map);
         switchMyLocation = findViewById(R.id.switchMyLocation);
-        setUpMap();
+        miseEnPlaceCarte();
 
+        //Si il n'y a pas de numéro de parcours on ferme l'activité
         int parcoursId = getIntent().getIntExtra("parcoursId", -1);
         if (parcoursId < 0) {
             finish();
         }
-
+        //on récupère les oeuvres et on les places sur la carte
         getOeuvres(parcoursId);
 
     }
 
+    /**
+     * Récupération des oeuvres depuis l'API, placement sur la carte des marqueurs corespondants
+     *
+     * @param parcoursId : identifiant du parcours
+     */
     private void getOeuvres(int parcoursId) {
 
         Log.d(TAG, "ParcoursId: " + parcoursId);
@@ -79,8 +90,8 @@ public class MapActivity extends AppCompatActivity implements DdaleInfoWindow.on
                     Log.d(TAG, "onResponse: ");
                     parcours = response.body();
                     oeuvres = parcours.getOeuvres();
-                    //warmUpCache(oeuvres);
-                    setUpOeuvreMarkers(oeuvres);
+                    preparerCache(oeuvres);
+                    miseEnPlaceMarquers(oeuvres);
                     IMapController mapController = map.getController();
                     mapController.setZoom(20);
                     ((IMapController) mapController).setCenter(new GeoPoint(oeuvres.get(0).getLocalisation().getLatitude(), oeuvres.get(0).getLocalisation().getLongitude() - 0.0001));
@@ -92,29 +103,41 @@ public class MapActivity extends AppCompatActivity implements DdaleInfoWindow.on
 
             @Override
             public void onFailure(Call<Parcours> call, Throwable t) {
-
+                Log.d(TAG, "API Timout");
             }
         });
 
     }
 
-    private void warmUpCache(List<Oeuvre> oeuvres) {
+    /**
+     * Tente de mettres les images du parcours en cache à l'aide de picasso
+     *
+     * @param oeuvres du parcours à charger
+     */
+    private void preparerCache(List<Oeuvre> oeuvres) {
         for (Oeuvre oeuvre : oeuvres) {
             Picasso.get().load(oeuvre.getUrlImageCible()).fetch();
         }
     }
 
-    private void setUpMap() {
+    /**
+     * Mise en place de la carte du
+     */
+    private void miseEnPlaceCarte() {
         map = (MapView) findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setMultiTouchControls(true);
         final List<Overlay> overlays = map.getOverlays();
         ScaleBarOverlay mScaleBarOverlay = new ScaleBarOverlay(map);
         overlays.add(mScaleBarOverlay);
-        setUpMyLocationOverlay();
+        miseEnPlaceMyLocationOverlay();
     }
 
-    private void setUpOeuvreMarkers(List<Oeuvre> oeuvres) {
+    /**
+     * Mes en place les marqueurs sur la carte à partir d'une liste d'oeuvre
+     * @param oeuvres : oeuvres à placer sur la carte
+     */
+    private void miseEnPlaceMarquers(List<Oeuvre> oeuvres) {
         ArrayList<Marker> markers = new ArrayList<>(oeuvres.size());
         for (Oeuvre oeuvre : oeuvres) {
             Marker marker = new Marker(map);
@@ -131,9 +154,13 @@ public class MapActivity extends AppCompatActivity implements DdaleInfoWindow.on
         map.getOverlays().addAll(markers);
     }
 
-    private void setUpMyLocationOverlay() {
+    /**
+     * Mise en place de l'overlay avec la position de l'utilisateur,
+     * Mise en place de l'interupteur pour activer ou non l'overlay
+     */
+    private void miseEnPlaceMyLocationOverlay() {
         myLocationNewOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), map);
-        myLocationNewOverlay.setPersonIcon(getBitmap(R.drawable.ic_person_pin_32dp));
+        myLocationNewOverlay.setPersonIcon(recupererBitmap(R.drawable.ic_person_pin_32dp));
         myLocationNewOverlay.setPersonHotspot(40, 40);
         myLocationNewOverlay.disableMyLocation();
         map.getOverlays().add(myLocationNewOverlay);
@@ -167,9 +194,16 @@ public class MapActivity extends AppCompatActivity implements DdaleInfoWindow.on
         map.onPause();  //needed for compass, my location overlays, v6.0.0 and up
     }
 
-    private Bitmap getBitmap(int drawableRes) {
+    /**
+     * Permet de récupérer un bitmap à partir d'un drawable.
+     * Sert à convertir l'icon pour placer l'utilisateur
+     * @param drawableRes : drawable à convertir
+     * @return : le bitmap corespondant
+     */
+    private Bitmap recupererBitmap(int drawableRes) {
         Drawable drawable = getDrawable(drawableRes);
         Canvas canvas = new Canvas();
+        assert drawable != null;
         Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
         canvas.setBitmap(bitmap);
         drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
@@ -178,12 +212,12 @@ public class MapActivity extends AppCompatActivity implements DdaleInfoWindow.on
         return bitmap;
     }
 
-    private void goToARActivity(Oeuvre oeuvre) {
-        Intent arIntent = new Intent(MapActivity.this, ARActivity.class);
-        arIntent.putExtra("idOeuvre", oeuvre.getId());
-        startActivity(arIntent);
-    }
-
+    /**
+     * Implémentation de l'interface de DdaleInfoWindow
+     * Objectif : au click sur le bouton dans l'info bulle on va dans l'activité de réalité augmenté
+     * en passant en bundle l'id de l'oeuvre.
+     * @param oeuvreId : id de l'oeuvre liée à l'infobulle
+     */
     @Override
     public void onARButtonClick(int oeuvreId) {
         Intent arIntent = new Intent(MapActivity.this, ARActivity.class);
