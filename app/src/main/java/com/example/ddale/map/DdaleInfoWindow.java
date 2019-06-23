@@ -35,7 +35,7 @@ public class DdaleInfoWindow extends MarkerInfoWindow {
             }
         });
         imageView = new ImageView(mView.getContext());
-        Picasso.get().load(oeuvre.getUrlImageCible()).into(imageView); //Téléchargement de l'image dans l'intermédiaire
+        Picasso.get().load("https://ddale.rezoleo.fr/"+oeuvre.getUrlImageCible()).into(imageView); //Téléchargement de l'image dans l'intermédiaire
     }
 
 

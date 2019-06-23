@@ -87,7 +87,7 @@ public class ChoixParcoursActivity extends AppCompatActivity implements Recycler
     public void onParcoursClick(int position) {
         Intent intent = new Intent(this, MapActivity.class);
 
-        intent.putExtra("IdParcours", ListeParcours.get(position).getId());
+        intent.putExtra("parcoursId", ListeParcours.get(position).getId());
 
         this.startActivity(intent);
 

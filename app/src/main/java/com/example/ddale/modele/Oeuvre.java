@@ -72,8 +72,25 @@ public class Oeuvre {
     /**
      * <b>localisation</b> contient l'emplacement de l'oeuvre.
      */
-    //@SerializedName("")
     private GeoPoint localisation;
+
+    /**
+     * <b>latitude</b> contient la latitude de l'oeuvre
+     */
+    @SerializedName("latitude")
+    private double latitude;
+
+    /**
+     * <b>longitude</b> contient la longitude de l'oeuvre
+     */
+    @SerializedName("longitude")
+    private double longitude;
+
+    /**
+     * <b>altitude</b> contient la altitude de l'oeuvre
+     */
+    @SerializedName("altitude")
+    private double altitude;
 
     /**
      * Constructeur par parametres d'une oeuvre
@@ -169,7 +186,13 @@ public class Oeuvre {
      * @return la localisation de l'oeuvre
      */
     public GeoPoint getLocalisation() {
-        return localisation;
+        if (localisation!=null){
+            return localisation;
+        }
+        else {
+            localisation = new GeoPoint(latitude, longitude, altitude);
+            return localisation;
+        }
     }
 
     /**
@@ -262,7 +285,6 @@ public class Oeuvre {
     public String toString() {
         String res = "{\"oeuvre\": {" +
                 "\"id\": " + id +
-                ", \"localisation\": \"" + localisation.toString()  + '\"' +
                 ", \"titre\": \"" + titre + '\"' +
                 ", \"auteur\": \"" + auteur + '\"' +
                 ", \"annee\": \"" + annee + '\"' +
