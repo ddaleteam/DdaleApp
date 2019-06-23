@@ -21,9 +21,18 @@ import cn.easyar.Engine;
 
 public class GLView extends GLSurfaceView
 {
+    /**
+     * Objet qui sert de controlleur pour l'affichage de la camera et des objets AR
+     */
     private final ARManager ARManager;
 
-    //Contructeur
+    /* -------------------DEBUT DU CODE RECUPERE DEPUIS L'EXAMPLE EASYAR------------------------------*/
+
+    /**
+     * Constructeur
+     *
+     * @param context contexte pour l'accès aux ressurces de l'application
+     */
     public GLView(Context context) {
         super(context);
         setEGLContextFactory(new ContextFactory());
@@ -74,7 +83,7 @@ public class GLView extends GLSurfaceView
         //this.setOnClickListener(this);
     }
 
-    //Start of region comportement de la vue
+    //Fin de region comportement de la vue
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
@@ -107,24 +116,20 @@ public class GLView extends GLSurfaceView
         Engine.onPause();
         super.onPause();
     }
+    //Fin de region Cycle de Vie de la vue
 
-
-    //End of region Cycle de Vie de la vue
-
-    //Start of Region Classes Internes
-    private static class ContextFactory implements EGLContextFactory {
-        private static int EGL_CONTEXT_CLIENT_VERSION = 0x3098;
-
-        public EGLContext createContext(EGL10 egl, EGLDisplay display, EGLConfig eglConfig) {
-            EGLContext context;
-            int[] attrib = { EGL_CONTEXT_CLIENT_VERSION, 2, EGL10.EGL_NONE };
-            context = egl.eglCreateContext(display, eglConfig, EGL10.EGL_NO_CONTEXT, attrib );
-            return context;
-        }
-
-        public void destroyContext(EGL10 egl, EGLDisplay display, EGLContext context) {
-            egl.eglDestroyContext(display, context);
-        }
+    /**
+     * Notifie l'ARManager pour lui permettre d'initialiser son tracker
+     *
+     * @param cheminCible url de l'image cible à télécharger
+     */
+    public void notifier(final String cheminCible) {
+        queueEvent(new Runnable() {
+            // This method will be called on the rendering thread:
+            public void run() {
+                ARManager.notifier(cheminCible);
+            }
+        });
     }
 
     private static class ConfigChooser implements EGLConfigChooser {
@@ -170,27 +175,55 @@ public class GLView extends GLSurfaceView
             return configs[0];
         }
     }
-    //End of Region Classes Internes
+    //Fin de Region Classes Internes
+    /* ---------------------FIN DU CODE RECUPERE DEPUIS L'EXAMPLE EASYAR------------------------------*/
 
-    //Gestion du click sur bouton
     /*
     GLView et ArManager ont des threads différents, on utilise donc la méthode queueEvent pour
     appeler une fonction de ARManager
      */
-    public void notifier(final String cheminCible) {
-        queueEvent( new Runnable() {
-        // This method will be called on the rendering thread:
-        public void run() {
-            ARManager.notifier(cheminCible);
-        }});
-    }
 
+    /**
+     * Demande à l'ARManager de changer de claque
+     *
+     * @param cheminCalque url de l'image du calque à télécharger
+     */
     public void changerCalque(final String cheminCalque) {
-        queueEvent( new Runnable() {
+        queueEvent(new Runnable() {
             // This method will be called on the rendering thread:
             public void run() {
                 ARManager.changerCalque(cheminCalque);
-            }});
+            }
+        });
+    }
+
+    /**
+     * Demande à l'ARManager de ne rien afficher
+     */
+    public void afficherVide() {
+        queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                ARManager.afficherVide();
+            }
+        });
+
+    }
+
+    //Début de Region Classes Internes
+    private static class ContextFactory implements EGLContextFactory {
+        private static int EGL_CONTEXT_CLIENT_VERSION = 0x3098;
+
+        public EGLContext createContext(EGL10 egl, EGLDisplay display, EGLConfig eglConfig) {
+            EGLContext context;
+            int[] attrib = {EGL_CONTEXT_CLIENT_VERSION, 2, EGL10.EGL_NONE};
+            context = egl.eglCreateContext(display, eglConfig, EGL10.EGL_NO_CONTEXT, attrib);
+            return context;
+        }
+
+        public void destroyContext(EGL10 egl, EGLDisplay display, EGLContext context) {
+            egl.eglDestroyContext(display, context);
+        }
     }
 
 }

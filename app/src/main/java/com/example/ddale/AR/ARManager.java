@@ -53,43 +53,31 @@ class ARManager
     private RectangleRenderer rectangleRenderer;
     private Context contexte;
     private String CAT = "ARManager";
+    private Bitmap imageVide;
 
     /**
      * Constructeur de ARManager
+     * initialise l'image vide à afficher par défaut
      * @param contexte : contexte pour l'accès aux ressources de l'application
      */
     ARManager(Context contexte)
     {
         trackers = new ArrayList<>();
         this.contexte = contexte;
+        imageVide = BitmapFactory.decodeResource(contexte.getResources(), R.drawable.vide);
     }
 
-    //demarrer region chargerCibles
-    private void chargerDepuisImage(ImageTracker tracker, String path)
-    {
-        ImageTarget cible = new ImageTarget();
-        String jstr = "{\n"
-            + "  \"images\" :\n"
-            + "  [\n"
-            + "    {\n"
-            + "      \"image\" : \"" + path + "\",\n"
-            + "      \"name\" : \"" + path.substring(0, path.indexOf(".")) + "\"\n"
-            + "    }\n"
-            + "  ]\n"
-            + "}";
-        //cible.setup(jstr, StorageType.Absolute | StorageType.Json, "");
-        cible.setup(jstr, StorageType.Assets | StorageType.Json, "");
-        tracker.loadTarget(cible, new FunctorOfVoidFromPointerOfTargetAndBool() {
-            @Override
-            public void invoke(Target cible, boolean status) {
-                Log.i(CAT, String.format("load cible (%b): %s (%d)",
-                        status, cible.name(), cible.runtimeID()));
-            }
-        });
-    }
+    /* -------------------DEBUT DU CODE RECUPERE DEPUIS L'EXAMPLE EASYAR------------------------------*/
 
-    private void chargerDepuisImageLocale(ImageTracker tracker, String path)
-    {
+    //Début de région chargerCibles
+
+    /**
+     * Fonction qui charge dans le tracker indiqué l'image cible
+     *
+     * @param tracker tracker
+     * @param path    le chemin absolu de l'image cible dans le téléphone
+     */
+    private void chargerDepuisImageLocale(ImageTracker tracker, String path) {
         ImageTarget cible = new ImageTarget();
         String jstr = "{\n"
                 + "  \"images\" :\n"
@@ -109,68 +97,29 @@ class ARManager
             }
         });
     }
+    //Fin de Région chargerCibles
 
-    private void chargerDepuisJson(ImageTracker tracker, String path, String ciblename)
-    {
-        ImageTarget cible = new ImageTarget();
-        cible.setup(path, StorageType.Assets, ciblename);
-        tracker.loadTarget(cible, new FunctorOfVoidFromPointerOfTargetAndBool() {
-            @Override
-            public void invoke(Target cible, boolean status) {
-                Log.i(CAT, String.format("load cible (%b): %s (%d)",
-                        status, cible.name(), cible.runtimeID()));
-            }
-        });
-    }
+    //Début de Région Cycle de Vie
 
-    private void chargerTousJson(ImageTracker tracker, String path)
-    {
-        for (ImageTarget cible : ImageTarget.setupAll(path, StorageType.Assets)) {
-            tracker.loadTarget(cible, new FunctorOfVoidFromPointerOfTargetAndBool() {
-                @Override
-                public void invoke(Target cible, boolean status) {
-                    Log.i(CAT, String.format("load cible (%b): %s (%d)",
-                            status, cible.name(), cible.runtimeID()));
-                }
-            });
-        }
-    }
-    //end region chargerCibles
-
-    //demarrer region cycle de Vie
     /**
-     * fonction d'initialisation du Manager
+     * Fonction d'initialisation du Manager
      * initialise la camera, sa taille et le streamer (qui transmet les images)
-     *
      * @return un boolean qui qualifie l'état de l'initialisation
      */
-    boolean initialiser()
-    {
+    boolean initialiser() {
         camera = new CameraDevice();
         streamer = new CameraFrameStreamer();
         streamer.attachCamera(camera);
-
         boolean status;
         status = camera.open(CameraDeviceType.Default);
         camera.setSize(new Vec2I(1280, 720));
-
-        if (!status)
-            return status;
-
-        else{
-            /*
-            ImageTracker tracker = new ImageTracker();
-            tracker.attachStreamer(streamer);
-            chargerDepuisImage(tracker, "stones.jpg");
-            chargerDepuisImage(tracker, "sammllrezo.jpeg");
-            trackers.add(tracker);
-            */
-            return status;
-        }
+        return status;
     }
 
-    void demarrer()
-    {
+    /**
+     * Démarre les différents objets nécéssaires (camera, transmetteur, et trackers)
+     */
+    void demarrer() {
         camera.start();
         streamer.start();
         camera.setFocusMode(CameraDeviceFocusMode.Continousauto);
@@ -179,8 +128,10 @@ class ARManager
         }
     }
 
-    void arreter()
-    {
+    /**
+     * Arrete les trackers, la camera et son transmetteur
+     */
+    void arreter() {
         for (ImageTracker tracker : trackers) {
             tracker.stop();
         }
@@ -188,8 +139,10 @@ class ARManager
         camera.stop();
     }
 
-    void eliminer()
-    {
+    /**
+     * Une fois arreter, les objets peuvent êtres éliminés pour libérer l'espace mémoire
+     */
+    void eliminer() {
         for (ImageTracker tracker : trackers) {
             tracker.dispose();
         }
@@ -210,12 +163,13 @@ class ARManager
             camera = null;
         }
     }
-    //end region cycle de Vie
+    //Fin de région Cycle de Vie
 
-    //demarrer region Actions du Manager
+    //Début de région Actions du Manager
 
     /**
      * Initialisation des renderer (video et rectangle)
+     * Démarre les moteurs video (pour la camera) et openGl
      */
     void initialiserGL()
     {
@@ -225,23 +179,22 @@ class ARManager
         cameraRenderer = new Renderer();
 
         rectangleRenderer = new RectangleRenderer();
-        rectangleRenderer.init(chargerBitmap(contexte.getResources(),R.drawable.fromage));
+        rectangleRenderer.init(imageVide);
     }
 
     /**
      * Mise à jour des dimensions
-     * @param width nouvelle largeur
-     * @param height nouvelle hauteur
+     * @param largeur nouvelle largeur
+     * @param hauteur nouvelle hauteur
      */
-    void redimensionnerGL(int width, int height)
-    {
-        tailleVue = new Vec2I(width, height);
+    void redimensionnerGL(int largeur, int hauteur) {
+        tailleVue = new Vec2I(largeur, hauteur);
         viewportChanged = true;
     }
 
     /**
      * Mise a jour du viewPort
-     * Gestion de tailleVue
+     * Gestion de la taille de l'affichage
      */
     private void majViewport()
     {
@@ -275,15 +228,16 @@ class ARManager
 
     /**
      * Lancement du calcul des objets à afficher
+     * Nettoie les éléments affichés,puis
+     * Vérifie le bon fonctionnement des objets et les dimensions de l'affichage
      */
-    void render()
-    {
+    void render() {
         GLES20.glClearColor(1.f, 1.f, 1.f, 1.f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
         if (cameraRenderer != null) {
             Vec4I default_viewport = new Vec4I(0, 0, tailleVue.data[0], tailleVue.data[1]);
-            GLES20.glViewport(default_viewport.data[0], default_viewport.data[1], 
+            GLES20.glViewport(default_viewport.data[0], default_viewport.data[1],
                     default_viewport.data[2], default_viewport.data[3]);
             if (cameraRenderer.renderErrorMessage(default_viewport)) {
                 return;
@@ -294,7 +248,7 @@ class ARManager
         Frame frame = streamer.peek();
         try {
             majViewport();
-            GLES20.glViewport(viewport.data[0], viewport.data[1], 
+            GLES20.glViewport(viewport.data[0], viewport.data[1],
                     viewport.data[2], viewport.data[3]);
 
             if (cameraRenderer != null) {
@@ -317,13 +271,17 @@ class ARManager
 
                 }
             }
-        }
-        finally {
+        } finally {
             frame.dispose();
         }
     }
+    /* ---------------------FIN DU CODE RECUPERE DEPUIS L'EXAMPLE EASYAR------------------------------*/
 
-
+    /**
+     * Change l'image affichée pour la nouvelle image voulue
+     * @param cheminImage Url de l'image à télécharger
+     * les calques sont gérés en cache par Picasso
+     */
     void changerCalque(String cheminImage) {
         Log.i(CAT, "changerCalque: " + cheminImage);
         Bitmap imageCalque;
@@ -335,8 +293,14 @@ class ARManager
         }
     }
 
+
+    /**
+     * Notifie l'ARManager
+     * Récupère l'image cible depuis son url et la sauvegarde localement
+     * Puis charge l'image dans le tracker
+     * @param cheminCible url de l'image de la cible
+     */
     void notifier(String cheminCible) {
-        Log.i(CAT, "notifier");
         Log.i(CAT, "notifier: " + cheminCible);
 
         ImageTracker tracker = new ImageTracker();
@@ -348,7 +312,8 @@ class ARManager
         } catch (IOException e) {
             e.printStackTrace();
         }
-        String path = saveToInternalStorage(bitmap,cheminCible.substring(cheminCible.lastIndexOf("/")+1));
+        String path = sauvegarderFichierEnLocal(bitmap,
+                cheminCible.substring(cheminCible.lastIndexOf("/")+1));
         Log.i("ALLER", "notifier: " + path);
 
         chargerDepuisImageLocale(tracker, path);
@@ -357,42 +322,40 @@ class ARManager
 
         tracker.start();
     }
-    //end region Actions du Manager
-
+    //Fin de region Actions du Manager
 
     /**
-     * Charge le bitmap d'une image située dans les ressources de l'application
-     * @param resources accès aux ressources de l'application
-     * @param idImage id de l'image dans les ressources de l'application (R.id.image)
-     * @return un bitmap correspondant à l'image
+     * Sauvegarde le bitmap donnée dans le cache local
+     * @param bitmapImage bitmap à sauvegarder
+     * @param nomImage nom donné à l'image en local
+     * @return le chemin absolu de l'image sauvegardée
      */
-    private Bitmap chargerBitmap(android.content.res.Resources resources , int idImage) {
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inScaled = false; //Pas de mise à l'échelle
-        return BitmapFactory.decodeResource(resources, idImage, options);
-    }
-
-
-    private String saveToInternalStorage (Bitmap bitmapImage, String ImgName) {
-        // path to /data/data/yourapp/app_data/imageDir
+    private String sauvegarderFichierEnLocal(Bitmap bitmapImage, String nomImage) {
         File directory = contexte.getCacheDir();
-        // Create imageDir
-        File mypath=new File(directory,ImgName);
-
-        FileOutputStream fos = null;
+        File chemin = new File(directory, nomImage);
+        FileOutputStream fileOutputStream = null;
         try {
-            fos = new FileOutputStream(mypath);
-            // Use the compress method on the BitMap object to write image to the OutputStream
-            bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            fileOutputStream = new FileOutputStream(chemin);
+            // Compression du bitmap en png
+            bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             try {
-                fos.close();
+                if (fileOutputStream != null) {
+                    fileOutputStream.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        return directory.getAbsolutePath() + "/" + ImgName;
+        return directory.getAbsolutePath() + "/" + nomImage;
+    }
+
+    /**
+     * Affiche une image vide dans le rectangle rendu
+     */
+    void afficherVide() {
+        rectangleRenderer.changerCalque(imageVide);
     }
 }
