@@ -33,40 +33,38 @@ public class MapActivity extends AppCompatActivity {
     MapView map = null;
     private MyLocationNewOverlay myLocationNewOverlay;
     private Switch switchMyLocation;
+    private ArrayList<Oeuvre> oeuvres;
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Oeuvre oeuvre = new Oeuvre(1, 3.14749, 50.61014, 0, "Le Radeau de la Méduse", "Théodore Géricault", 1818, 491, 716, "Peinture à l'huile", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/JEAN_LOUIS_TH%C3%89ODORE_G%C3%89RICAULT_-_La_Balsa_de_la_Medusa_%28Museo_del_Louvre%2C_1818-19%29.jpg/320px-JEAN_LOUIS_TH%C3%89ODORE_G%C3%89RICAULT_-_La_Balsa_de_la_Medusa_%28Museo_del_Louvre%2C_1818-19%29.jpg", "");
+        oeuvres = new ArrayList<>(1);
+        oeuvres.add(0,oeuvre);
         super.onCreate(savedInstanceState);
+
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
-        //setting this before the layout is inflated is a good idea
-        //it 'should' ensure that the map has a writable location for the map cache, even without permissions
-        //if no tiles are displayed, you can try overriding the cache path using Configuration.getInstance().setCachePath
-        //see also StorageUtils
-        //note, the load method also sets the HTTP User Agent to your application's package name, abusing osm's tile servers will get you banned based on this string
-        //inflate and create the map
         setContentView(R.layout.activity_map);
         switchMyLocation = findViewById(R.id.switchMyLocation);
 
+        setUpMap();
+        setUpOeuvreMarkers(oeuvres);
+
+
+    }
+
+    private void setUpMap() {
         map = (MapView) findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setMultiTouchControls(true);
         final List<Overlay> overlays = map.getOverlays();
         ScaleBarOverlay mScaleBarOverlay = new ScaleBarOverlay(map);
         overlays.add(mScaleBarOverlay);
-
-        setUpMyLocationOverlay();
-
-        ArrayList<Oeuvre> oeuvres = new ArrayList<>(1);
-        oeuvres.add(0,oeuvre);
-        setUpOeuvreMarkers(oeuvres);
-
-
         IMapController mapController = map.getController();
         mapController.setZoom(20);
-        ((IMapController) mapController).setCenter(new GeoPoint(oeuvre.getLocalisation().getLatitude(), oeuvre.getLocalisation().getLongitude() - 0.0001));
+        ((IMapController) mapController).setCenter(new GeoPoint(oeuvres.get(0).getLocalisation().getLatitude(), oeuvres.get(0).getLocalisation().getLongitude() - 0.0001));
+        setUpMyLocationOverlay();
     }
 
     private void setUpOeuvreMarkers(ArrayList<Oeuvre> oeuvres) {
