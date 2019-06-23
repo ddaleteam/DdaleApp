@@ -9,5 +9,7 @@
     <string name="consigneQR">This your captain speaking.
         \n\nPlease scan the QR Code next to the tableau.</string>
     <string name="maPosition">"Ma position "</string>
+    <string name="hello">Hello</string>
+    <string name="duree">duree</string>
 
 </resources>
