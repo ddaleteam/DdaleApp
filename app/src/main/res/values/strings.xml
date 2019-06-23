@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Ddale</string>
-    <string name="information_tableau">Information Tableau</string>
-    <string name="choix_parcours">Choix Parcours</string>
+    <string name="information_tableau">Oeuvre</string>
+    <string name="choix_parcours">Parcours</string>
     <string name="question">Bienvenue sur l\'application Ddale ! \n\n
         Que voulez-vous faire aujourd\'hui ? </string>
     <string name="suivant">Suivant</string>
@@ -11,7 +11,7 @@
     <string name="maPosition">"Ma position "</string>
     <string name="hello">Hello</string>
     <string name="duree">duree</string>
-    <string name="internet">Aucune connexion réseau détectée ! \n Veuillez redémarrer l\'application.</string>
+    <string name="internet">Aucune connexion réseau détectée !</string>
 
 
 </resources>
