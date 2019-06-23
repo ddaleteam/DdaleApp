@@ -1,5 +1,7 @@
 package com.example.ddale;
 
+
+import androidx.appcompat.app.AppCompatActivity;
 import android.Manifest;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -9,8 +11,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 /**
@@ -58,18 +58,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        /* Bouton de debug permettant d'accéder à l'activité ARActivity sans passer par l'activité
-                QRActivity */
-        /*
-        Button btnDebugAR = findViewById(R.id.btnDebugAR);
-        btnDebugAR.setOnClickListener(new View.OnClickListener() {
+         parcours.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent arIntent = new Intent(MainActivity.this, ARActivity.class);
-                startActivity(arIntent);
+                Intent i = new Intent(MainActivity.this, ChoixParcoursActivity.class);
+                startActivity(i);
             }
         });
-        */
     }
 
     /** Fonction onResume appelée lors de la reprise de l'activité courante après mise en pause

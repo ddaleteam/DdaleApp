@@ -28,9 +28,9 @@ public class Parcours {
      */
     private List<Oeuvre> oeuvres;
     /**
-     * <b>duree</b> represente la duree du parcours
+     * <b>duree</b> represente la duree du parcours en minute
      */
-    private String duree;
+    private int duree;
 
     /**
      * Constructeur par defaut
@@ -40,7 +40,7 @@ public class Parcours {
     public Parcours() {
         nom = "";
         oeuvres = new ArrayList<>();
-        duree = "0";
+        duree = 0;
     }
 
     /**
@@ -49,7 +49,7 @@ public class Parcours {
      * @param duree la duree du parcours
      * La liste des oeuvres associees au parcours est vide
      */
-    public Parcours(String nom, String duree) {
+    public Parcours(String nom, int duree) {
         this.nom = nom;
         this.duree = duree;
         oeuvres = new ArrayList<>();
@@ -61,7 +61,7 @@ public class Parcours {
      * @param oeuvres la liste des oeuvres associees au parcours
      * @param duree la duree du parcours
      */
-    public Parcours(String nom, List<Oeuvre> oeuvres, String duree) {
+    public Parcours(String nom, List<Oeuvre> oeuvres, int duree) {
         this.nom = nom;
         this.oeuvres = oeuvres;
         this.duree = duree;
@@ -111,7 +111,7 @@ public class Parcours {
      * Accesseur de la duree
      * @return la duree du parcours
      */
-    public String getDuree() {
+    public int getDuree() {
         return duree;
     }
 
@@ -119,7 +119,7 @@ public class Parcours {
      * Mutateur de la duree du parcours
      * @param duree la nouvelle a attribuer
      */
-    public void setDuree(String duree) {
+    public void setDuree(int duree) {
         this.duree = duree;
     }
 
