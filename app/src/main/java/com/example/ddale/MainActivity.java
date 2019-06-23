@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
+<<<<<<< HEAD
         /*
         Button btnDebugAR = findViewById(R.id.btnDebugAR);
         btnDebugAR.setOnClickListener(new View.OnClickListener() {
@@ -37,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         */
+=======
+>>>>>>> 6453458af0e786a96ea58ae985011395aeaf024e
 
         parcours.setOnClickListener(new View.OnClickListener() {
             @Override
