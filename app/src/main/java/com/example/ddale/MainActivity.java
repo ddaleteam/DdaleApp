@@ -17,15 +17,6 @@ import androidx.appcompat.app.AppCompatActivity;
 public class MainActivity extends AppCompatActivity {
 
     /**
-     * <b>parcours</b> le bouton permettant de sélectionner le mode Parcours
-     */
-    private Button parcours;
-    /**
-     * <b>info</b> le bouton permettant de sélectionner le mode Informations
-     */
-    private Button info;
-
-    /**
      * Fonction onCreate appelée lors de le création de l'activité
      * @param savedInstanceState données à récupérer si l'activité est réinitialisée après
      *          avoir planté
@@ -37,8 +28,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Initialisation des boutons
-        info = findViewById(R.id.info);
-        parcours = findViewById(R.id.parcours);
+        Button info = findViewById(R.id.info);
+        Button parcours = findViewById(R.id.parcours);
 
         /* Mise en place des écouteurs d'évènements */
 
@@ -51,7 +42,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         /* Bouton de debug permettant d'accéder à l'activité ARActivity sans passer par l'activité
-                QRActivity
+                QRActivity */
+        /*
         Button btnDebugAR = findViewById(R.id.btnDebugAR);
         btnDebugAR.setOnClickListener(new View.OnClickListener() {
             @Override
