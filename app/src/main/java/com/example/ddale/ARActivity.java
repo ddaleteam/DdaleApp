@@ -1,20 +1,16 @@
 package com.example.ddale;
 
-import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -22,13 +18,14 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.ddale.API.APIClient;
 import com.example.ddale.API.APIInterface;
 import com.example.ddale.AR.GLView;
 import com.example.ddale.modele.Oeuvre;
+
+import java.io.File;
 
 import cn.easyar.Engine;
 import retrofit2.Call;
@@ -109,7 +106,6 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ar);
-
         // Récupération de l'identifiant de l'oeuvre envoyé par l'activité précédente
         idOeuvre = getIntent().getIntExtra("idOeuvre", 1);
         Log.i(CAT, "onCreate: " + idOeuvre);
@@ -145,6 +141,7 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
             public void onReceive(Context ctxt, Intent intent) {
                 audio = MediaPlayer.create(ARActivity.this, chemin);
                 btnImgAudio.setVisibility(View.VISIBLE);
+                Log.i(CAT, "onReceive: received audio");
             }
         };
         registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
@@ -167,19 +164,11 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
         glView = new GLView(ARActivity.this);
         glView.setOnClickListener(ARActivity.this);
 
-        /* Demande des permissions camera */
-        requestCameraPermission(new PermissionCallback() {
-            @Override
-            public void onSuccess() {
-                ViewGroup group = findViewById(R.id.preview);
-                group.addView(glView,new ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
-            }
 
-            @Override
-            public void onFailure() {
-            }
-        });
+        ViewGroup group = findViewById(R.id.preview);
+        group.addView(glView, new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
     }
 
     /**
@@ -219,6 +208,7 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        Log.i(CAT, "onDestroy: ");
         unregisterReceiver(onComplete);
         if (audio != null) {
             audio.release();
@@ -226,58 +216,6 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
         }
     }
     /* --------------------- Fin de la région du cycle de vie de l'activité --------------------- */
-
-
-
-    /* --------------------- Début de la région de gestion des permissions ---------------------- */
-    private interface PermissionCallback {
-        void onSuccess();
-        void onFailure();
-    }
-
-    private SparseArray<PermissionCallback> permissionCallbacks = new SparseArray<>();
-    private int permissionRequestCodeSerial = 0;
-
-    @TargetApi(23)
-    private void requestCameraPermission(PermissionCallback callback) {
-        if (Build.VERSION.SDK_INT >= 23) {
-            if (checkSelfPermission(Manifest.permission.CAMERA)
-                    != PackageManager.PERMISSION_GRANTED) {
-
-                int requestCode = permissionRequestCodeSerial;
-                permissionRequestCodeSerial += 1;
-                permissionCallbacks.put(requestCode, callback);
-                requestPermissions(new String[]{Manifest.permission.CAMERA}, requestCode);
-            } else {
-                callback.onSuccess();
-            }
-        } else {
-            callback.onSuccess();
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult
-            (int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (permissionCallbacks.get(requestCode) != null) {
-            PermissionCallback callback = permissionCallbacks.get(requestCode);
-            permissionCallbacks.remove(requestCode);
-            boolean executed = false;
-            for (int result : grantResults) {
-                if (result != PackageManager.PERMISSION_GRANTED) {
-                    executed = true;
-                    callback.onFailure();
-                }
-            }
-            if (!executed) {
-                callback.onSuccess();
-            }
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-    /* ---------------------- Fin de la région de gestion des permissions ----------------------- */
-
-
 
     /* --------------------------------- Début de la région API --------------------------------- */
     /**
@@ -314,8 +252,6 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
                         chemin = telechargeAudio("https://ddale.rezoleo.fr/" +
                                 oeuvre.getUrlAudio());
                         Log.i(CAT, "onResponse: " + chemin);
-                        audio = MediaPlayer.create(ARActivity.this,chemin);
-                        btnImgAudio.setVisibility(View.VISIBLE);
                     }
 
                 } else {
@@ -357,6 +293,7 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
             case R.id.btnPrecedent:
                 indiceCalqueActif = (indiceCalqueActif == -1) ? nbCalques : indiceCalqueActif -1;
                 changer(indiceCalqueActif);
+                btnImgAudio.setImageResource(android.R.drawable.ic_media_play);
                 break;
             /* Si on clique sur le bouton "Suivant", on passe au calque suivant et on l'affiche
                 (changement cyclique)
@@ -364,18 +301,21 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
             case R.id.btnSuivant:
                 indiceCalqueActif = (indiceCalqueActif == nbCalques) ? -1 : indiceCalqueActif +1;
                 changer(indiceCalqueActif);
+                btnImgAudio.setImageResource(android.R.drawable.ic_media_play);
                 break;
             /* Si on clique sur le bouton de lecture du fichier audio, on joue ou met en pause le
                 fichier audio le cas échéant, et on change l'image associée au bouton
             */
             case R.id.imgBtnAudio:
                 if (audio.isPlaying()) {
-                    btnImgAudio.setImageResource(android.R.drawable.ic_media_pause);
+                    btnImgAudio.setImageResource(android.R.drawable.ic_media_play);
                     audio.pause();
+                    break;
                 }
                 else{
-                    btnImgAudio.setImageResource(android.R.drawable.ic_media_play);
+                    btnImgAudio.setImageResource(android.R.drawable.ic_media_pause);
                     audio.start();
+                    break;
                 }
              /* Si on clique n'importe où d'autre, on cache les informations de l'écran
             */
@@ -429,16 +369,22 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
      * @return l'URI de stockage local du fichier audio une fois téléchargé
      */
     private Uri telechargeAudio(String url){
-        Log.i(CAT, "telechargeAudio: " + url);
         Uri uriServeur = Uri.parse(url);
-        DownloadManager.Request request = new DownloadManager.Request(uriServeur);
-        Uri uriLocale = Uri.parse(getCacheDir().getAbsolutePath() + "/audio/" +
-                uriServeur.getLastPathSegment());
-        Log.i(CAT, "telechargeAudio: " + uriLocale);
-        request.setDestinationUri(uriLocale);
-        downloadManager.enqueue(request);
-        return uriLocale;
-
+        DownloadManager.Request requete = new DownloadManager.Request(uriServeur);
+        String nom = uriServeur.getLastPathSegment().substring(0, uriServeur.getLastPathSegment().length() - 4);
+        Uri locale = Uri.parse("file://storage/sdcard/Android/data/com.example.ddale/" + nom + ".mp3");
+        File fichier = new File(Environment.getExternalStorageDirectory().getPath()
+                + "/Android/data/com.example.ddale/" + nom + ".mp3");
+        if (!fichier.exists()) {
+            Log.i("CAT", "telechargeAudio: " + locale);
+            requete.setDestinationUri(locale);
+            downloadManager.enqueue(requete);
+        } else {
+            audio = MediaPlayer.create(ARActivity.this, locale);
+            btnImgAudio.setVisibility(View.VISIBLE);
+            Log.i(CAT, "onReceive: used cached audio");
+        }
+        return locale;
     }
     /* ---------------------------- Fin de la région gestion du clic ---------------------------- */
 }

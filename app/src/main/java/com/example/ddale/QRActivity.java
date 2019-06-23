@@ -23,12 +23,8 @@ import me.dm7.barcodescanner.zxing.ZXingScannerView;
  */
 public class QRActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler {
 
-    /**
-     * <b>mScannerView</b> l'objet qui permet de scanner un QRCode, la vue du scanner
-     */
-    private ZXingScannerView mScannerView;
-
     private String CAT = "QR";
+    private FrameLayout mCameraView;
 
     /**
      * Fonction onCreate appelée lors de le création de l'activité
@@ -45,18 +41,13 @@ public class QRActivity extends AppCompatActivity implements ZXingScannerView.Re
         // Récupération des éléments du layout
         TextView consigne = findViewById(R.id.consigneQR);
         consigne.bringToFront();
-        FrameLayout mCameraView = findViewById(R.id.camera_preview);
+        mCameraView = findViewById(R.id.camera_preview);
 
         // Demande de permission d'accès à la caméra
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
                 1);
 
-        // Initialisation de la vue du scanner et association au layout
-        mScannerView = new ZXingScannerView(getApplicationContext());
-        mCameraView.addView(mScannerView);
 
-        // Mise en place du gestionnaire du résultat du scan
-        mScannerView.setResultHandler(this);
     }
 
     /**
@@ -66,6 +57,16 @@ public class QRActivity extends AppCompatActivity implements ZXingScannerView.Re
     @Override
     protected void onStart() {
         super.onStart();
+        // Initialisation de la vue du scanner et association au layout
+
+        /*
+          <b>mScannerView</b> l'objet qui permet de scanner un QRCode, la vue du scanner
+         */
+        ZXingScannerView mScannerView = new ZXingScannerView(getApplicationContext());
+        mCameraView.addView(mScannerView);
+
+        // Mise en place du gestionnaire du résultat du scan
+        mScannerView.setResultHandler(this);
         mScannerView.startCamera();
     }
 
