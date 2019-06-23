@@ -1,12 +1,14 @@
 package com.example.ddale;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 
@@ -14,6 +16,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.ddale.map.DdaleInfoWindow;
 import com.example.ddale.modele.Oeuvre;
+import com.example.ddale.modele.Parcours;
+import com.squareup.picasso.Picasso;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
@@ -29,11 +33,17 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MapActivity extends AppCompatActivity {
+import static androidx.core.content.ContextCompat.startActivity;
+
+public class MapActivity extends AppCompatActivity implements DdaleInfoWindow.onARButtonClickListener{
     MapView map = null;
     private MyLocationNewOverlay myLocationNewOverlay;
     private Switch switchMyLocation;
     private ArrayList<Oeuvre> oeuvres;
+    private Parcours parcours;
+
+    public MapActivity() {
+    }
 
 
     @Override
@@ -42,6 +52,9 @@ public class MapActivity extends AppCompatActivity {
         oeuvres = new ArrayList<>(1);
         oeuvres.add(0,oeuvre);
         super.onCreate(savedInstanceState);
+
+
+        warmUpCache(oeuvres);
 
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
@@ -52,6 +65,12 @@ public class MapActivity extends AppCompatActivity {
         setUpOeuvreMarkers(oeuvres);
 
 
+    }
+
+    private void warmUpCache(ArrayList<Oeuvre> oeuvres) {
+        for (Oeuvre oeuvre : oeuvres){
+            Picasso.get().load(oeuvre.getUrlImageCible()).fetch();
+        }
     }
 
     private void setUpMap() {
@@ -73,7 +92,7 @@ public class MapActivity extends AppCompatActivity {
             Marker marker = new Marker(map);
             marker.setRelatedObject(oeuvre);
             marker.setPosition(oeuvre.getLocalisation());
-            marker.setInfoWindow(new DdaleInfoWindow(map, oeuvre));
+            marker.setInfoWindow(new DdaleInfoWindow(map, oeuvre,this));
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
             marker.setIcon(getDrawable(R.drawable.ic_place_32dp));
             marker.setTitle(oeuvre.getTitre());
@@ -131,6 +150,18 @@ public class MapActivity extends AppCompatActivity {
         return bitmap;
     }
 
+    private void goToARActivity(Oeuvre oeuvre){
+        Intent arIntent = new Intent(MapActivity.this, ARActivity.class);
+        arIntent.putExtra("idOeuvre", oeuvre.getId() );
+        startActivity(arIntent);
+    }
+
+    @Override
+    public void onARButtonClick(int oeuvreId) {
+        Intent arIntent = new Intent(MapActivity.this, ARActivity.class);
+        arIntent.putExtra("idOeuvre", oeuvreId);
+        startActivity(arIntent);
+    }
 }
 
 

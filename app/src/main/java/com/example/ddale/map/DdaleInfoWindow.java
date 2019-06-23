@@ -1,10 +1,10 @@
 package com.example.ddale.map;
 
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import com.example.ddale.R;
 import com.example.ddale.modele.Oeuvre;
@@ -17,21 +17,25 @@ public class DdaleInfoWindow extends MarkerInfoWindow {
 
     private final ImageView imageView;
 
+    public interface onARButtonClickListener {
+        void onARButtonClick(int oeuvreId);
+    }
+
     /**
      * @param mapView
      */
-    public DdaleInfoWindow(MapView mapView, final Oeuvre oeuvre) {
+    public DdaleInfoWindow(MapView mapView, final Oeuvre oeuvre, final onARButtonClickListener onARButtonClickListener) {
         super(R.layout.bubble_ddale_layout, mapView);
         Button btn = (Button) (mView.findViewById(R.id.bubble_moreinfo));
         btn.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                Toast.makeText(view.getContext(), "Button clicked - oeuvre : " + oeuvre.getId(), Toast.LENGTH_LONG).show();
+            @Override
+            public void onClick(View v) {
+                Log.i("PMR", "Intent vers AR activit avec OeuvreId = " + oeuvre.getId());
+                onARButtonClickListener.onARButtonClick(oeuvre.getId());
             }
         });
         imageView = new ImageView(mView.getContext());
         Picasso.get().load(oeuvre.getUrlImageCible()).into(imageView); //Téléchargement de l'image dans l'intermédiaire
-        Drawable drawableImageOeuvre = imageView.getDrawable();//Transfert de l'image depuis l'intermédiaire vers le marker
-
     }
 
 
@@ -43,8 +47,6 @@ public class DdaleInfoWindow extends MarkerInfoWindow {
         if (mMarkerRef.getImage() == null) {
             mMarkerRef.setImage(imageView.getDrawable());
         }
-
-
     }
 
 
