@@ -50,13 +50,18 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         return mListeParcours.size();
     }
 
+    public void show(ArrayList<Parcours> listeParcours) {
+        mListeParcours = listeParcours;
+        notifyDataSetChanged();
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView nomParcours;
         TextView duree;
         CardView parentLayout;
         ImageView imageView;
-        OnParcoursListener onParcoursListener;
+        OnParcoursListener mOnParcoursListener;
 
         public ViewHolder(@NonNull View itemView, OnParcoursListener onParcoursListener) {
             super(itemView);
@@ -65,6 +70,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             parentLayout=itemView.findViewById(R.id.parent_layout);
             imageView=itemView.findViewById(R.id.image_oeuvre);
 
+            this.mOnParcoursListener = onParcoursListener;
             itemView.setOnClickListener(this);
         }
 
