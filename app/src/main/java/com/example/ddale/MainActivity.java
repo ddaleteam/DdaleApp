@@ -58,7 +58,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        parcours.setOnClickListener(new View.OnClickListener() {
+         parcours.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, ChoixParcoursActivity.class);
+                startActivity(i);
+            }
+        });
     }
 
     /** Fonction onResume appelée lors de la reprise de l'activité courante après mise en pause
