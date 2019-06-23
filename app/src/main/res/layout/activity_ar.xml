@@ -1,5 +1,6 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/constraintLayoutAR"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -10,10 +11,27 @@
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0">
 
     </FrameLayout>
+
+    <ImageButton
+        android:id="@+id/imgBtnAudio"
+        android:layout_width="@android:dimen/notification_large_icon_height"
+        android:layout_height="@android:dimen/notification_large_icon_width"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:alpha="@dimen/alphaAR"
+        android:background="@android:color/transparent"
+        android:scaleType="fitXY"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/preview"
+        app:layout_constraintTop_toBottomOf="@+id/description"
+        app:srcCompat="@android:drawable/ic_media_play"
+        tools:ignore="ContentDescription" />
 
     <Button
         android:id="@+id/btnSuivant"

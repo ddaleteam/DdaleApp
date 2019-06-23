@@ -11,5 +11,7 @@
     <string name="maPosition">"Ma position "</string>
     <string name="hello">Hello</string>
     <string name="duree">duree</string>
+    <string name="internet">Aucune connexion réseau détectée ! \n Veuillez redémarrer l\'application.</string>
+
 
 </resources>
