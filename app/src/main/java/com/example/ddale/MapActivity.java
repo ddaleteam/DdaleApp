@@ -1,9 +1,14 @@
 package com.example.ddale;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.Switch;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -26,6 +31,7 @@ import java.util.List;
 public class MapActivity extends AppCompatActivity {
     MapView map = null;
     private MyLocationNewOverlay myLocationNewOverlay;
+    private Switch switchMyLocation;
 
 
     @Override
@@ -41,15 +47,17 @@ public class MapActivity extends AppCompatActivity {
         //note, the load method also sets the HTTP User Agent to your application's package name, abusing osm's tile servers will get you banned based on this string
         //inflate and create the map
         setContentView(R.layout.activity_map);
+        switchMyLocation = findViewById(R.id.switchMyLocation);
+
         map = (MapView) findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setMultiTouchControls(true);
         final List<Overlay> overlays = map.getOverlays();
         ScaleBarOverlay mScaleBarOverlay = new ScaleBarOverlay(map);
         overlays.add(mScaleBarOverlay);
-        myLocationNewOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), map);
-        myLocationNewOverlay.enableMyLocation();
-        map.getOverlays().add(myLocationNewOverlay);
+
+        setUpMyLocationOverlay();
+
 
 
         Marker startMarker = new Marker(map);
@@ -65,7 +73,25 @@ public class MapActivity extends AppCompatActivity {
 
         IMapController mapController = map.getController();
         mapController.setZoom(20);
-        ((IMapController) mapController).setCenter(new GeoPoint(oeuvre.getLocalisation().getLatitude(),oeuvre.getLocalisation().getLongitude()-0.0001));
+        ((IMapController) mapController).setCenter(new GeoPoint(oeuvre.getLocalisation().getLatitude(), oeuvre.getLocalisation().getLongitude() - 0.0001));
+    }
+
+    private void setUpMyLocationOverlay() {
+        myLocationNewOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(this), map);
+        myLocationNewOverlay.setPersonIcon(getBitmap(R.drawable.ic_person_pin_32dp));
+        myLocationNewOverlay.setPersonHotspot(40, 40);
+        myLocationNewOverlay.disableMyLocation();
+        map.getOverlays().add(myLocationNewOverlay);
+        switchMyLocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    myLocationNewOverlay.enableMyLocation();
+                } else {
+                    myLocationNewOverlay.disableMyLocation();
+                }
+            }
+        });
     }
 
     public void onResume() {
@@ -86,6 +112,16 @@ public class MapActivity extends AppCompatActivity {
         map.onPause();  //needed for compass, my location overlays, v6.0.0 and up
     }
 
+    private Bitmap getBitmap(int drawableRes) {
+        Drawable drawable = getDrawable(drawableRes);
+        Canvas canvas = new Canvas();
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        canvas.setBitmap(bitmap);
+        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+        drawable.draw(canvas);
+
+        return bitmap;
+    }
 
 }
 
