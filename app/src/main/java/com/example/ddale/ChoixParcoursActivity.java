@@ -31,10 +31,7 @@ public class ChoixParcoursActivity extends AppCompatActivity implements Recycler
         setContentView(R.layout.activity_choix_parcours);
 
         RecyclerView recyclerView = findViewById(R.id.recyclerview);
-
-        // on crée une liste de parcours par défaut
-        ArrayList<Parcours> ListeParcours = creerListeParcours();
-
+        
         // on crée l'adapter
         adapter = new RecyclerViewAdapter(ListeParcours, this);
 
@@ -83,22 +80,6 @@ public class ChoixParcoursActivity extends AppCompatActivity implements Recycler
                 Log.d(TAG, "Erreur lors de l'appel à l'API pour récupérer l'oeuvre : timeout");
             }
         });
-    }
-
-    /**
-     * @return liste par défaut
-     */
-    private ArrayList<Parcours> creerListeParcours() {
-        Parcours parcours1 = new Parcours("Premier parcours", 10);
-        Parcours parcours2 = new Parcours("Deuxième parcours", 30);
-        Parcours parcours3 = new Parcours("Premier parcours", 20);
-
-
-        ListeParcours.add(parcours1);
-        ListeParcours.add(parcours2);
-        ListeParcours.add(parcours3);
-
-        return ListeParcours;
     }
 
     /**
