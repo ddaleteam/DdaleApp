@@ -230,9 +230,8 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
                 if (response.isSuccessful()) {
                     Log.i("Oeuvre : " +CAT,response.body().toString());
                     ARActivity.this.oeuvre = new Oeuvre(response.body());
-                    Log.i(CAT, "onResponse: " + oeuvre.getCalques());
                     indiceCalqueActif = -1;
-                    nbCalques = oeuvre.getCalques().size() -1;
+                    nbCalques = (oeuvre.getCalques() != null) ? oeuvre.getCalques().size() - 1 : -1;
                     glView.notifier("https://ddale.rezoleo.fr/" +
                             oeuvre.getUrlImageCible());
                     String descriptionOeuvre = oeuvre.getTitre() + ", " + oeuvre.getAnnee() +"\n" +
