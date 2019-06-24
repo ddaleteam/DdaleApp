@@ -1,6 +1,5 @@
 package com.example.ddale;
 
-import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -231,12 +230,6 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
                 if (response.isSuccessful()) {
                     Log.i("Oeuvre : " +CAT,response.body().toString());
                     ARActivity.this.oeuvre = new Oeuvre(response.body());
-                    AlertDialog.Builder builder = new AlertDialog.Builder(ARActivity.this);
-                    builder.setTitle("Scan Result");
-                    builder.setMessage("Titre de l'oeuvre : " + oeuvre.getTitre()+"\nPar " +
-                            oeuvre.getAuteur());
-                    AlertDialog alert1 = builder.create();
-                    alert1.show();
                     Log.i(CAT, "onResponse: " + oeuvre.getCalques());
                     indiceCalqueActif = -1;
                     nbCalques = oeuvre.getCalques().size() -1;
@@ -291,7 +284,8 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
                 l'affiche (changement cyclique)
             */
             case R.id.btnPrecedent:
-                audio.pause();
+                if (audio != null)
+                    audio.pause();
                 indiceCalqueActif = (indiceCalqueActif == -1) ? nbCalques : indiceCalqueActif -1;
                 changer(indiceCalqueActif);
                 btnImgAudio.setImageResource(android.R.drawable.ic_media_play);
@@ -300,7 +294,8 @@ public class ARActivity extends AppCompatActivity implements View.OnClickListene
                 (changement cyclique)
             */
             case R.id.btnSuivant:
-                audio.pause();
+                if (audio != null)
+                    audio.pause();
                 indiceCalqueActif = (indiceCalqueActif == nbCalques) ? -1 : indiceCalqueActif +1;
                 changer(indiceCalqueActif);
                 btnImgAudio.setImageResource(android.R.drawable.ic_media_play);
